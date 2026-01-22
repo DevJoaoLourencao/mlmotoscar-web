@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#000000" rx="64"/>
+  
+  <!-- ML em vermelho centralizado -->
+  <g fill="#FF0000">
+    <!-- M -->
+    <path d="M80 140 L80 372 L130 372 L130 220 L190 372 L230 372 L290 220 L290 372 L340 372 L340 140 L260 140 L210 280 L160 140 Z"/>
+    
+    <!-- L -->
+    <path d="M360 140 L360 372 L480 372 L480 322 L410 322 L410 140 Z"/>
+  </g>
+</svg>
