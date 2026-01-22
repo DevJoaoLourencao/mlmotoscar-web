@@ -168,7 +168,7 @@ export default function VehicleDetails() {
       {images.length > 0 && (
         <div className="w-full mt-6 mb-8">
           {images.length <= 3 ? (
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-10">
               <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {images.map((img, index) => (
@@ -231,7 +231,7 @@ export default function VehicleDetails() {
       )}
 
       {/* Two Cards Layout */}
-      <div className="container mx-auto px-4 pb-12">
+      <div className="container mx-auto px-10 pb-12">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Vehicle Details Card */}
           <Card className="bg-card border-border !shadow-sm hover:!shadow-sm hover:!translate-y-0 !transition-none">

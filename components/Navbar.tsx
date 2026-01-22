@@ -35,7 +35,7 @@ export default function Navbar() {
                 : settings.logoLight || "/logo.png"
             }
             alt={settings.storeName}
-            className="h-12 w-auto max-w-[200px] object-contain transition-opacity hover:opacity-90"
+            className="h-7 md:h-10 w-auto max-w-[120px] md:max-w-[160px] object-contain transition-opacity hover:opacity-90"
           />
         </Link>
 

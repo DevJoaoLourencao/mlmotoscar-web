@@ -4,7 +4,7 @@ import {
   Mail,
   MapPin,
   MessageCircle,
-  Phone,
+  Phone
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSettings } from "./SettingsProvider";
@@ -14,14 +14,11 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { settings } = useSettings();
   const { theme } = useTheme();
-
-  // Função para limpar e formatar telefone para WhatsApp
   const formatPhoneForWhatsApp = (phone: string) => {
     return phone.replace(/\D/g, '');
   };
-
   return (
-    <footer className="bg-card border-t border-border pt-16 pb-8 text-sm transition-colors duration-300">
+    <footer className="px-4 bg-card border-t border-border pt-16 pb-8 text-sm transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Column */}
@@ -43,7 +40,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4 pt-2">
               <a
-                href="https://www.instagram.com/mlmotoscarmarilia/"
+                href={settings.socialInstagram || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all"
@@ -51,8 +48,8 @@ export default function Footer() {
                 <Instagram className="h-4 w-4" />
               </a>
               <a
-                href="https://www.facebook.com/mlmotoscarmarilia/?locale=pt_BR"
-                target="_blank"
+                href={settings.socialFacebook || "#"}
+                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all"
               >
@@ -169,10 +166,10 @@ export default function Footer() {
             <div className="flex items-start space-x-3 text-muted-foreground mb-4">
               <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('R. Felipe Camarão, 113 - Lorenzetti, Marília - SP, 17506-320')}`}
+                href="https://www.google.com/maps/search/?api=1&query=R.+Felipe+Camarão,+113+-+Lorenzetti,+Marília+-+SP,+17506-320"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="not-italic hover:text-primary transition-colors"
+                className="hover:text-primary transition-colors"
               >
                 R. Felipe Camarão, 113 - Lorenzetti, Marília - SP, 17506-320
               </a>
