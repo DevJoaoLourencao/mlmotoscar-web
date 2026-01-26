@@ -1,14 +1,5 @@
-import Autoplay from "embla-carousel-autoplay";
 import { Award, Shield, Target, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from "../components/ui/carousel";
+import { VehicleGallery } from "../components/VehicleGallery";
 import { Card, CardContent } from "../components/ui/core";
 
 // Imagens da loja - imagens reais da ML MOTOSCAR
@@ -36,26 +27,6 @@ const STORE_IMAGES = [
 ].filter((img) => img);
 
 export default function About() {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!api) return;
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
-
-  const autoplayPlugin = Autoplay({
-    delay: 3000,
-    stopOnInteraction: true,
-    stopOnMouseEnter: true,
-  });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -101,87 +72,23 @@ export default function About() {
             </p>
           </div>
 
-          {/* Carousel Shadcn */}
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: "center",
-              loop: true,
-            }}
-            plugins={[autoplayPlugin]}
-            className="w-full group"
-          >
-            <div className="relative h-[300px] md:h-[500px] rounded-xl overflow-hidden bg-muted border border-border shadow-xl">
-              <CarouselContent className="-ml-0 h-full">
-                {STORE_IMAGES.length > 0 ? (
-                  STORE_IMAGES.map((imgSrc, index) => (
-                    <CarouselItem
-                      key={index}
-                      className="pl-0 basis-full h-[300px] md:h-[500px]"
-                    >
-                      <div className="relative w-full h-full bg-muted flex items-center justify-center">
-                        <img
-                          src={imgSrc}
-                          alt={`ML MOTOSCAR - Imagem ${index + 1}`}
-                          loading={index === 0 ? "eager" : "lazy"}
-                          className="w-full h-full object-cover object-center"
-                          style={{
-                            objectPosition: "center 60%",
-                          }}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (!target.dataset.fallback) {
-                              target.dataset.fallback = "true";
-                              target.src =
-                                "https://images.unsplash.com/photo-1562519819-016930d676f6?q=80&w=2000&auto=format&fit=crop";
-                            }
-                          }}
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))
-                ) : (
-                  <CarouselItem>
-                    <div className="flex items-center justify-center h-full bg-muted">
-                      <p className="text-muted-foreground text-center px-4 text-sm md:text-base">
-                        Adicione imagens na pasta /public/store-images/
-                      </p>
-                    </div>
-                  </CarouselItem>
-                )}
-              </CarouselContent>
-
-              {STORE_IMAGES.length > 1 && (
-                <>
-                  <CarouselPrevious className="left-2 md:left-4 bg-black/70 hover:bg-primary text-white border-none rounded-full h-8 w-8 md:h-12 md:w-12 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <CarouselNext className="right-2 md:right-4 bg-black/70 hover:bg-primary text-white border-none rounded-full h-8 w-8 md:h-12 md:w-12 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  {/* Contador de imagens */}
-                  <div className="absolute top-2 md:top-4 right-2 md:right-4 bg-black/50 text-white px-2 md:px-3 py-1 rounded-full text-xs md:text-sm z-20">
-                    {current} / {count}
-                  </div>
-                </>
-              )}
+          {/* Gallery com Swiper + Lightbox */}
+          {STORE_IMAGES.length > 0 ? (
+            <div className="w-full">
+              <VehicleGallery 
+                images={STORE_IMAGES} 
+                vehicleTitle="ML MOTOSCAR"
+                showThumbnails={false}
+                showPagination={true}
+              />
             </div>
-
-            {/* Indicators - abaixo da imagem */}
-            {STORE_IMAGES.length > 1 && (
-              <div className="flex justify-center space-x-2 mt-3 md:mt-4">
-                {STORE_IMAGES.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => api?.scrollTo(index)}
-                    className={`rounded-full transition-all duration-300 ${
-                      index + 1 === current
-                        ? "bg-primary w-6 md:w-8 h-2"
-                        : "bg-muted-foreground/50 hover:bg-muted-foreground/80 w-2 h-2"
-                    }`}
-                    aria-label={`Ir para imagem ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </Carousel>
+          ) : (
+            <div className="relative h-[300px] md:h-[500px] rounded-xl overflow-hidden bg-muted border border-border shadow-xl flex items-center justify-center">
+              <p className="text-muted-foreground text-center px-4 text-sm md:text-base">
+                Adicione imagens na pasta /public/store-images/
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Values */}

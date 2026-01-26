@@ -1,0 +1,25 @@
+/* Estilos customizados para paginação do Swiper */
+.swiper-pagination-custom {
+  position: relative !important;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  bottom: auto !important;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--muted-foreground) / 0.3);
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet-active {
+  background: hsl(var(--primary)) !important;
+  width: 32px;
+  border-radius: 4px;
+}
