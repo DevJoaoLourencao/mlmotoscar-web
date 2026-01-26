@@ -657,6 +657,7 @@ export default function VehicleDetails() {
               <p className="text-xs text-muted-foreground mb-3">
                 Resumo da Simulação:
               </p>
+
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">
                   {vehicle.brand} {vehicle.model} - {vehicle.year}
