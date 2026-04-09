@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../components/SettingsProvider";
+import { usePageTitle } from "../hooks/usePageTitle";
 import VehicleCard from "../components/VehicleCard";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/core";
@@ -34,6 +35,7 @@ function StarDisplay({ rating }: { rating: number }) {
 }
 
 export default function Home() {
+  usePageTitle();
   const { settings } = useSettings();
   const [featured, setFeatured] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,14 +60,14 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative mt-[-80px] h-[800px] flex items-center overflow-hidden">
+      <section className="relative mt-[-80px] h-[900px] flex items-center overflow-hidden">
         <video
           autoPlay
           loop
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
-          style={{ objectPosition: "center 40%" }}
+          style={{ objectPosition: "center 40%", opacity: 0.5 }}
         >
           <source src="/moto.mp4" type="video/mp4" />
           Seu navegador não suporta vídeos HTML5.

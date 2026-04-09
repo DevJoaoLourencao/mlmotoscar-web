@@ -11,10 +11,16 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { settings } = useSettings();
 
+  const isActivePath = (path: string) =>
+    location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
+
   const isActive = (path: string) =>
-    location.pathname === path
+    isActivePath(path)
       ? "text-primary font-semibold"
       : "text-foreground/80 hover:text-primary";
+
+  const ariaCurrent = (path: string): "page" | undefined =>
+    isActivePath(path) ? "page" : undefined;
 
   // Use dynamic variable for background, or fallback to default styles if empty
   const navStyle = settings.navbarColor
@@ -41,25 +47,16 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className={`text-sm transition-colors ${isActive("/")}`}>
+          <Link to="/" aria-current={ariaCurrent("/")} className={`text-sm transition-colors ${isActive("/")}`}>
             Início
           </Link>
-          <Link
-            to="/catalogo"
-            className={`text-sm transition-colors ${isActive("/catalogo")}`}
-          >
+          <Link to="/catalogo" aria-current={ariaCurrent("/catalogo")} className={`text-sm transition-colors ${isActive("/catalogo")}`}>
             Catálogo
           </Link>
-          <Link
-            to="/sobre"
-            className={`text-sm transition-colors ${isActive("/sobre")}`}
-          >
+          <Link to="/sobre" aria-current={ariaCurrent("/sobre")} className={`text-sm transition-colors ${isActive("/sobre")}`}>
             Sobre
           </Link>
-          <Link
-            to="/contato"
-            className={`text-sm transition-colors ${isActive("/contato")}`}
-          >
+          <Link to="/contato" aria-current={ariaCurrent("/contato")} className={`text-sm transition-colors ${isActive("/contato")}`}>
             Contato
           </Link>
           
@@ -107,40 +104,16 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden border-t border-border bg-background transition-all animate-in slide-in-from-top-5 duration-200 shadow-xl">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <Link
-              to="/"
-              onClick={() => setIsOpen(false)}
-              className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive(
-                "/"
-              )}`}
-            >
+            <Link to="/" onClick={() => setIsOpen(false)} aria-current={ariaCurrent("/")} className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive("/")}`}>
               Início
             </Link>
-            <Link
-              to="/catalogo"
-              onClick={() => setIsOpen(false)}
-              className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive(
-                "/catalogo"
-              )}`}
-            >
+            <Link to="/catalogo" onClick={() => setIsOpen(false)} aria-current={ariaCurrent("/catalogo")} className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive("/catalogo")}`}>
               Catálogo
             </Link>
-            <Link
-              to="/sobre"
-              onClick={() => setIsOpen(false)}
-              className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive(
-                "/sobre"
-              )}`}
-            >
+            <Link to="/sobre" onClick={() => setIsOpen(false)} aria-current={ariaCurrent("/sobre")} className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive("/sobre")}`}>
               Sobre
             </Link>
-            <Link
-              to="/contato"
-              onClick={() => setIsOpen(false)}
-              className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive(
-                "/contato"
-              )}`}
-            >
+            <Link to="/contato" onClick={() => setIsOpen(false)} aria-current={ariaCurrent("/contato")} className={`text-sm py-2 px-2 rounded-md hover:bg-muted ${isActive("/contato")}`}>
               Contato
             </Link>
           </div>

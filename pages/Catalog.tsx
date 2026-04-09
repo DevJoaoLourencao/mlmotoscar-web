@@ -12,11 +12,13 @@ import {
   Skeleton,
 } from "../components/ui/core";
 import { getVehiclesPaginated } from "../services/vehicleService";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { Vehicle } from "../types";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function Catalog() {
+  usePageTitle("Catálogo de Veículos");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);

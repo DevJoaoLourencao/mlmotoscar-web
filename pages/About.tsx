@@ -1,4 +1,5 @@
 import { Award, Shield, Target, Users } from "lucide-react";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { VehicleGallery } from "../components/VehicleGallery";
 import { Card, CardContent } from "../components/ui/core";
 
@@ -27,7 +28,7 @@ const STORE_IMAGES = [
 ].filter((img) => img);
 
 export default function About() {
-
+  usePageTitle("Nossa História");
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
@@ -53,30 +54,31 @@ export default function About() {
       <section className="py-10 md:py-24 mt-0 md:mt-24 container mx-auto px-10 sm:px-6 md:px-4 mb-10 md:mb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-center mb-24 md:mb-32">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-primary">
+            <h2 className="text-3xl md:text-3xl font-bold mb-4 md:mb-6 text-white">
               Paixão por Motores
             </h2>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-3 md:mb-4">
-              Com mais de 25 anos de experiência no mercado de motocicletas, a ML MOTOSCAR 
-              foi fundada em 2020, nascendo da paixão por duas rodas. Iniciamos nossa 
-              jornada com um pequeno estoque de motos de baixa cilindrada e, ao longo 
-              dos anos, passamos por várias mudanças de nomes e lugares até chegarmos 
-              onde estamos hoje.
+            <p className="text-sm md:text-lg text-muted-foreground leading-relaxed mb-3 md:mb-4">
+              Com mais de <span className="text-primary font-semibold">25 anos de experiência</span> no mercado de motocicletas, a{" "}
+              <span className="text-primary font-semibold">ML MOTOSCAR</span> foi fundada em 2020, nascendo da paixão por duas
+              rodas. Iniciamos nossa jornada com um pequeno estoque de motos de
+              baixa cilindrada e, ao longo dos anos, passamos por várias
+              mudanças de nomes e lugares até chegarmos onde estamos hoje.
             </p>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Atualmente, oferecemos uma grande variedade de veículos com diversos modelos 
-              e cilindradas, tanto de motos quanto de carros para venda. Nosso compromisso 
-              não é apenas vender um veículo, mas proporcionar uma experiência única de 
-              compra, garantindo qualidade e um atendimento personalizado que entende 
-              exatamente o que você procura.
+            <p className="text-sm md:text-lg text-muted-foreground leading-relaxed">
+              Atualmente, oferecemos uma <span className="text-primary font-semibold">grande variedade de veículos</span> com
+              diversos modelos e cilindradas, tanto de motos quanto de carros
+              para venda. Nosso compromisso não é apenas vender um veículo, mas
+              proporcionar uma <span className="text-primary font-semibold">experiência única de compra</span>, garantindo qualidade
+              e um <span className="text-primary font-semibold">atendimento personalizado</span> que entende exatamente o que você
+              procura.
             </p>
           </div>
 
           {/* Gallery com Swiper + Lightbox */}
           {STORE_IMAGES.length > 0 ? (
             <div className="w-full">
-              <VehicleGallery 
-                images={STORE_IMAGES} 
+              <VehicleGallery
+                images={STORE_IMAGES}
                 vehicleTitle="ML MOTOSCAR"
                 showThumbnails={false}
                 showPagination={true}
@@ -101,7 +103,9 @@ export default function About() {
               <div className="h-10 w-10 md:h-12 md:w-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <Shield className="h-5 w-5 md:h-6 md:w-6 text-primary" />
               </div>
-              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Confiança</h3>
+              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">
+                Confiança
+              </h3>
               <p className="text-xs md:text-sm text-muted-foreground">
                 Transparência total em cada negociação.
               </p>
@@ -112,7 +116,9 @@ export default function About() {
               <div className="h-10 w-10 md:h-12 md:w-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <Award className="h-5 w-5 md:h-6 md:w-6 text-primary" />
               </div>
-              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Qualidade</h3>
+              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">
+                Qualidade
+              </h3>
               <p className="text-xs md:text-sm text-muted-foreground">
                 Estoque rigorosamente selecionado.
               </p>
@@ -123,7 +129,9 @@ export default function About() {
               <div className="h-10 w-10 md:h-12 md:w-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <Target className="h-5 w-5 md:h-6 md:w-6 text-primary" />
               </div>
-              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Foco</h3>
+              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">
+                Foco
+              </h3>
               <p className="text-xs md:text-sm text-muted-foreground">
                 Entender para atender sua necessidade.
               </p>
@@ -134,7 +142,9 @@ export default function About() {
               <div className="h-10 w-10 md:h-12 md:w-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <Users className="h-5 w-5 md:h-6 md:w-6 text-primary" />
               </div>
-              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Comunidade</h3>
+              <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">
+                Comunidade
+              </h3>
               <p className="text-xs md:text-sm text-muted-foreground">
                 Criamos laços duradouros com clientes.
               </p>

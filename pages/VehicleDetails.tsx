@@ -20,6 +20,7 @@ import {
   Skeleton,
 } from "../components/ui/core";
 import { getVehicleById } from "../services/vehicleService";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { Vehicle } from "../types";
 
 export default function VehicleDetails() {
@@ -27,6 +28,8 @@ export default function VehicleDetails() {
   const { settings } = useSettings();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
+
+  usePageTitle(vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : undefined);
 
   // Installment Modal
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
@@ -387,7 +390,7 @@ export default function VehicleDetails() {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Valor
                   </p>
-                  <p className="text-2xl md:text-3xl font-bold text-primary">
+                  <p className="text-2xl md:text-3xl font-bold text-green-400">
                     {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",

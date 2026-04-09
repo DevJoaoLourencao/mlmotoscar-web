@@ -16,6 +16,7 @@ import { useTheme } from "./components/ThemeProvider";
 import { Button, Skeleton } from "./components/ui/core";
 import { useFavicon } from "./hooks/useFavicon";
 import About from "./pages/About";
+import NotFound from "./pages/NotFound";
 import Catalog from "./pages/Catalog";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
@@ -277,6 +278,8 @@ function AppRoutes() {
         <Route path="/catalogo/:id" element={<VehicleDetails />} />
         <Route path="/sobre" element={<About />} />
         <Route path="/contato" element={<Contact />} />
+        {/* 404 - exibe com Navbar e Footer */}
+        <Route path="*" element={<NotFound />} />
       </Route>
 
       {/* Admin Routes */}

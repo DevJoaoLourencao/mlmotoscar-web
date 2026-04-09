@@ -1,9 +1,4 @@
-- refatorar tela 404 quando nao encontrar
 - refatorar pdf de contrato de venda
-- adicionar opacidade no video da tela principal
-- alterar cor do valor do veiculo na tela de venda
-- tela de detalhe, manter selecionado opcao no menu superior o catalogo
-- aumentar tamanho do texto Paixão por Motores na tela sobre
 - dashboard nao usar vermlrho em numeros
 - remover card Mais Tempo Parado
 - remover do estoque a opcao de filtrar por status (vendido/disp)

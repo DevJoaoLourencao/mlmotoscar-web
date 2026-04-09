@@ -1,9 +1,11 @@
 import { Clock, ExternalLink, MessageCircle, Phone, Send } from "lucide-react";
 import React, { useState } from "react";
 import { useSettings } from "../components/SettingsProvider";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { Button, Card, CardContent, Input, Label } from "../components/ui/core";
 
 export default function Contact() {
+  usePageTitle("Fale Conosco");
   const { settings } = useSettings();
   const [formData, setFormData] = useState({
     name: "",
@@ -126,6 +128,8 @@ export default function Contact() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="absolute inset-0"
+              title="Localização da ML MOTOSCAR no Google Maps"
+              aria-label="Mapa com localização da loja ML MOTOSCAR"
             />
             <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10">
               <a

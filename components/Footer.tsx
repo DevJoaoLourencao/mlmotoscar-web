@@ -42,17 +42,19 @@ export default function Footer() {
                 href={settings.socialInstagram || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Siga a ML MOTOSCAR no Instagram (abre em nova aba)"
                 className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all"
               >
-                <Instagram className="h-4 w-4" />
+                <Instagram className="h-4 w-4" aria-hidden="true" />
               </a>
               <a
                 href={settings.socialFacebook || "#"}
-                 target="_blank"
+                target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Siga a ML MOTOSCAR no Facebook (abre em nova aba)"
                 className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all"
               >
-                <Facebook className="h-4 w-4" />
+                <Facebook className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
           </div>
