@@ -1,8 +1,12 @@
 import React from 'react';
+import { useSettings } from './SettingsProvider';
 
 export default function FloatingChat() {
+  const { settings } = useSettings();
+
   const handleClick = () => {
-    window.open('https://wa.me/5514991569560', '_blank');
+    const phone = settings.phoneSecondary.replace(/\D/g, '');
+    window.open(`https://wa.me/55${phone}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

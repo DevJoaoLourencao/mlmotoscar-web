@@ -35,6 +35,7 @@ export default function AdminLayout() {
     return saved ? JSON.parse(saved) : false;
   });
   const hasCheckedAuthRef = useRef(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   // Auth Guard - só executa uma vez
   useEffect(() => {
@@ -45,6 +46,8 @@ export default function AdminLayout() {
       const isAuth = await authService.isAuthenticated();
       if (!isAuth) {
         navigate("/admin/login");
+      } else {
+        setIsAuthChecking(false);
       }
     };
     checkAuth();
@@ -283,6 +286,17 @@ export default function AdminLayout() {
       </Button>
     </div>
   );
+
+  if (isAuthChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <span className="text-sm">Verificando acesso...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">

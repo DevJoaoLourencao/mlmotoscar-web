@@ -105,11 +105,6 @@ export default function Login() {
               {loading ? 'Autenticando...' : 'Entrar no Sistema'}
             </Button>
 
-            <div className="text-center">
-                <p className="text-xs text-muted-foreground">
-                    Credenciais de Demo: admin@mlmotoscar.com / admin
-                </p>
-            </div>
           </form>
         </CardContent>
       </Card>

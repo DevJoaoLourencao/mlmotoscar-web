@@ -4,4 +4,4 @@ Disallow: /#/admin/
 
 Allow: /
 
-Sitemap: https://mlmotoscar.com.br/sitemap.xml
+Sitemap: https://mlmotoscarmarilia.com.br/sitemap.xml
