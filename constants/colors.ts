@@ -1,0 +1,16 @@
+export const COLOR_OPTIONS = [
+  { value: "Preto", label: "Preto" },
+  { value: "Branco", label: "Branco" },
+  { value: "Prata", label: "Prata" },
+  { value: "Cinza", label: "Cinza" },
+  { value: "Vermelho", label: "Vermelho" },
+  { value: "Azul", label: "Azul" },
+  { value: "Verde", label: "Verde" },
+  { value: "Amarelo", label: "Amarelo" },
+  { value: "Laranja", label: "Laranja" },
+  { value: "Marrom", label: "Marrom" },
+  { value: "Bege", label: "Bege" },
+  { value: "Dourado", label: "Dourado" },
+  { value: "Roxo", label: "Roxo" },
+  { value: "Rosa", label: "Rosa" },
+];

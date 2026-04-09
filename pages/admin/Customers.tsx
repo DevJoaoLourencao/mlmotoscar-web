@@ -5,10 +5,12 @@ import {
   Phone,
   Plus,
   Search,
+  ShoppingBag,
   Trash2,
   User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AdminPageContainer,
   AdminPageHeader,
@@ -44,6 +46,7 @@ import {
 } from "../../validations/customerSchema";
 
 export default function Customers() {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -353,6 +356,19 @@ export default function Customers() {
                       </td>
                       <td className="p-4 align-middle text-right">
                         <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
+                            title="Ver vendas deste cliente"
+                            onClick={() =>
+                              navigate("/admin/vendas", {
+                                state: { initialSearch: customer.name },
+                              })
+                            }
+                          >
+                            <ShoppingBag className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"

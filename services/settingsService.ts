@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   phoneSecondaryName: "João Lourenção",
   emailContact: "vendas@mlmotoscar.com.br",
   address: "Av. Brasil, 1500 - Jardins, São Paulo - SP",
+  city: "",
+  state: "",
   openingHoursWeekdays: "Seg - Sex: 09h às 18h",
   openingHoursWeekend: "Sáb: 09h às 13h",
   socialInstagram: "https://instagram.com",

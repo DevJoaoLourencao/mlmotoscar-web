@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   DollarSign,
+  FileCheck,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -66,10 +67,14 @@ export default function AdminLayout() {
     localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
   };
 
-  const isActive = (path: string) =>
-    location.pathname === path
+  const isActive = (path: string, includeChildren = false) => {
+    const isMatch = includeChildren
+      ? location.pathname.startsWith(path)
+      : location.pathname === path;
+    return isMatch
       ? "bg-primary/10 text-primary font-medium"
       : "text-muted-foreground hover:text-foreground hover:bg-muted";
+  };
 
   // Sidebar dynamic style
   const sidebarStyle = settings.sidebarColor
@@ -92,7 +97,8 @@ export default function AdminLayout() {
       <Link to="/admin/estoque" className={isSidebarCollapsed ? "block mb-3" : "block"}>
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/estoque"
+            "/admin/estoque",
+            true
           )}`}
           title={isSidebarCollapsed ? "Estoque" : ""}
         >
@@ -100,26 +106,15 @@ export default function AdminLayout() {
           {!isSidebarCollapsed && <span className="text-sm md:text-base">Estoque</span>}
         </div>
       </Link>
-      <Link to="/admin/vendas" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link to="/admin/anuncios" className={isSidebarCollapsed ? "block mb-3" : "block"}>
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/vendas"
+            "/admin/anuncios"
           )}`}
-          title={isSidebarCollapsed ? "Vendas" : ""}
+          title={isSidebarCollapsed ? "Anúncios" : ""}
         >
-          <DollarSign className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Vendas</span>}
-        </div>
-      </Link>
-      <Link to="/admin/pagamentos" className={isSidebarCollapsed ? "block mb-3" : "block"}>
-        <div
-          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/pagamentos"
-          )}`}
-          title={isSidebarCollapsed ? "Pagamentos" : ""}
-        >
-          <Wallet className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Pagamentos</span>}
+          <Megaphone className="h-4 w-4 flex-shrink-0" />
+          {!isSidebarCollapsed && <span className="text-sm md:text-base">Anúncios</span>}
         </div>
       </Link>
       <Link to="/admin/clientes" className={isSidebarCollapsed ? "block mb-3" : "block"}>
@@ -138,21 +133,43 @@ export default function AdminLayout() {
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
             "/admin/financiamento"
           )}`}
-          title={isSidebarCollapsed ? "Financiamento" : ""}
+          title={isSidebarCollapsed ? "Simulador" : ""}
         >
           <Calculator className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Financiamento</span>}
+          {!isSidebarCollapsed && <span className="text-sm md:text-base">Simulador</span>}
         </div>
       </Link>
-      <Link to="/admin/anuncios" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link to="/admin/vendas" className={isSidebarCollapsed ? "block mb-3" : "block"}>
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/anuncios"
+            "/admin/vendas"
           )}`}
-          title={isSidebarCollapsed ? "Anúncios (Social)" : ""}
+          title={isSidebarCollapsed ? "Vendas" : ""}
         >
-          <Megaphone className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Anúncios (Social)</span>}
+          <DollarSign className="h-4 w-4 flex-shrink-0" />
+          {!isSidebarCollapsed && <span className="text-sm md:text-base">Vendas</span>}
+        </div>
+      </Link>
+      <Link to="/admin/contratos" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+        <div
+          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
+            "/admin/contratos"
+          )}`}
+          title={isSidebarCollapsed ? "Contratos" : ""}
+        >
+          <FileCheck className="h-4 w-4 flex-shrink-0" />
+          {!isSidebarCollapsed && <span className="text-sm md:text-base">Contratos</span>}
+        </div>
+      </Link>
+      <Link to="/admin/pagamentos" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+        <div
+          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
+            "/admin/pagamentos"
+          )}`}
+          title={isSidebarCollapsed ? "Pagamentos" : ""}
+        >
+          <Wallet className="h-4 w-4 flex-shrink-0" />
+          {!isSidebarCollapsed && <span className="text-sm md:text-base">Pagamentos</span>}
         </div>
       </Link>
       <Link to="/admin/configuracoes" className={isSidebarCollapsed ? "block mb-3" : "block"}>

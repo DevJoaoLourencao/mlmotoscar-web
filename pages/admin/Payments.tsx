@@ -2,6 +2,7 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle2,
+  Clock,
   DollarSign,
   Search,
   TrendingUp,
@@ -30,6 +31,7 @@ import {
   Skeleton,
 } from "../../components/ui/core";
 import { getSales, registerPayment } from "../../services/salesService";
+import { formatCurrencyBRL } from "../../utils/formatters";
 import { Sale } from "../../types";
 
 export default function Payments() {
@@ -80,16 +82,28 @@ export default function Payments() {
 
     const remaining = Math.max(0, totalDebt - totalPaid);
     const progress = totalDebt > 0 ? (totalPaid / totalDebt) * 100 : 0;
-    const isPaidOff = remaining <= 0; // Small tolerance might be needed in real float math, but int checks are fine here
+    const isPaidOff = remaining <= 0;
 
-    // Next Installment info (simple estimation)
-    const paidCount = Math.floor(
-      totalPaid / (sale.payment.installment_value || 1)
-    );
+    // Paid installments count (estimated)
+    const installmentValue = sale.payment.installment_value || 1;
+    const paidCount = Math.floor(totalPaid / installmentValue);
     const nextInstallmentNumber = Math.min(
       sale.payment.installment_count || 0,
       paidCount + 1
     );
+
+    // Overdue detection: assume first installment due 1 month after sale date
+    const saleDate = new Date(sale.created_at);
+    const now = new Date();
+    const monthsSinceSale =
+      (now.getFullYear() - saleDate.getFullYear()) * 12 +
+      (now.getMonth() - saleDate.getMonth());
+    const expectedPaidCount = Math.min(
+      sale.payment.installment_count || 0,
+      Math.max(0, monthsSinceSale)
+    );
+    const isOverdue = !isPaidOff && paidCount < expectedPaidCount;
+    const overdueInstallments = Math.max(0, expectedPaidCount - paidCount);
 
     return {
       totalDebt,
@@ -98,6 +112,8 @@ export default function Payments() {
       progress,
       isPaidOff,
       nextInstallmentNumber,
+      isOverdue,
+      overdueInstallments,
     };
   };
 
@@ -150,23 +166,17 @@ export default function Payments() {
         description="Gerencie recebimentos de promissórias e parcelamentos da loja."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-card border-border">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="p-3 rounded-full bg-blue-500/10 text-blue-500">
               <Wallet className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">A Receber (Total)</p>
+              <p className="text-sm text-muted-foreground">A Receber (Carnês)</p>
               <h3 className="text-2xl font-bold text-foreground">
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  sales.reduce(
-                    (acc, sale) => acc + getDebtInfo(sale).remaining,
-                    0
-                  )
+                {formatCurrencyBRL(
+                  sales.reduce((acc, sale) => acc + getDebtInfo(sale).remaining, 0)
                 )}
               </h3>
             </div>
@@ -178,16 +188,10 @@ export default function Payments() {
               <TrendingUp className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Recebido (Total)</p>
+              <p className="text-sm text-muted-foreground">Recebido via Carnê</p>
               <h3 className="text-2xl font-bold text-foreground">
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  sales.reduce(
-                    (acc, sale) => acc + getDebtInfo(sale).totalPaid,
-                    0
-                  )
+                {formatCurrencyBRL(
+                  sales.reduce((acc, sale) => acc + getDebtInfo(sale).totalPaid, 0)
                 )}
               </h3>
             </div>
@@ -203,6 +207,25 @@ export default function Payments() {
               <h3 className="text-2xl font-bold text-foreground">
                 {sales.filter((s) => !getDebtInfo(s).isPaidOff).length}
               </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {sales.filter((s) => getDebtInfo(s).isPaidOff).length} quitados
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border border-red-500/30">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-red-500/10 text-red-500">
+              <Clock className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Em Atraso</p>
+              <h3 className="text-2xl font-bold text-red-500">
+                {sales.filter((s) => getDebtInfo(s).isOverdue).length}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                clientes inadimplentes
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -238,12 +261,18 @@ export default function Payments() {
                   progress,
                   isPaidOff,
                   nextInstallmentNumber,
+                  isOverdue,
+                  overdueInstallments,
                 } = getDebtInfo(sale);
 
                 return (
                   <div
                     key={sale.id}
-                    className="group rounded-xl border border-border bg-background p-4 md:p-6 transition-all hover:border-primary/50 hover:shadow-md"
+                    className={`group rounded-xl border bg-background p-4 md:p-6 transition-all hover:shadow-md ${
+                      isOverdue
+                        ? "border-red-500/50 hover:border-red-500"
+                        : "border-border hover:border-primary/50"
+                    }`}
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                       <div>
@@ -254,6 +283,13 @@ export default function Payments() {
                           {isPaidOff && (
                             <Badge className="bg-green-500 text-white border-none">
                               <CheckCircle2 className="h-3 w-3 mr-1" /> Quitado
+                            </Badge>
+                          )}
+                          {isOverdue && (
+                            <Badge className="bg-red-500 text-white border-none">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {overdueInstallments}{" "}
+                              {overdueInstallments === 1 ? "parcela atrasada" : "parcelas atrasadas"}
                             </Badge>
                           )}
                         </div>
@@ -270,10 +306,7 @@ export default function Payments() {
                             isPaidOff ? "text-green-500" : "text-red-500"
                           }`}
                         >
-                          {new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(remaining)}
+                          {formatCurrencyBRL(remaining)}
                         </p>
                       </div>
                     </div>
@@ -283,17 +316,11 @@ export default function Payments() {
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>
                           Pago:{" "}
-                          {new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(totalPaid)}
+                          {formatCurrencyBRL(totalPaid)}
                         </span>
                         <span>
                           Total:{" "}
-                          {new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(totalDebt)}
+                          {formatCurrencyBRL(totalDebt)}
                         </span>
                       </div>
                       <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
@@ -317,10 +344,7 @@ export default function Payments() {
                           <span>
                             Parcela:{" "}
                             <strong>
-                              {new Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                              }).format(sale.payment.installment_value || 0)}
+                              {formatCurrencyBRL(sale.payment.installment_value || 0)}
                             </strong>
                           </span>
                         </div>
@@ -449,10 +473,7 @@ export default function Payments() {
                 Valor Restante para Quitação
               </p>
               <p className="text-3xl font-bold text-foreground">
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(paymentAmount)}
+                {formatCurrencyBRL(paymentAmount)}
               </p>
             </div>
 

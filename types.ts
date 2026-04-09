@@ -33,6 +33,7 @@ export interface Vehicle {
   description: string;
   images: string[]; // Changed from single image_url to array
   plate_end?: string;
+  purchase_price?: number; // Custo de aquisição (uso interno)
   status?: "available" | "sold" | "reserved";
 }
 
@@ -52,6 +53,8 @@ export interface AppSettings {
   phoneSecondaryName: string;
   emailContact: string;
   address: string;
+  city?: string;
+  state?: string;
   openingHoursWeekdays: string; // New: Horário de semana
   openingHoursWeekend: string; // New: Horário de fim de semana
   googleMapsUrl?: string;

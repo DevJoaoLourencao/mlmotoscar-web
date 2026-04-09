@@ -133,6 +133,37 @@ export default function SettingsPage() {
                 />
               )}
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Cidade</Label>
+                {loading ? (
+                  <Skeleton className="h-11 w-full" />
+                ) : (
+                  <Input
+                    name="city"
+                    value={formData.city || ""}
+                    onChange={handleInputChange}
+                    placeholder="Ex: São Paulo"
+                    className="bg-background text-foreground"
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Estado (UF)</Label>
+                {loading ? (
+                  <Skeleton className="h-11 w-full" />
+                ) : (
+                  <Input
+                    name="state"
+                    value={formData.state || ""}
+                    onChange={handleInputChange}
+                    placeholder="Ex: SP"
+                    maxLength={2}
+                    className="bg-background text-foreground uppercase"
+                  />
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 

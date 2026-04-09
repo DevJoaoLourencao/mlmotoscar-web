@@ -50,6 +50,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import PaymentMethodBadge from "../../components/PaymentMethodBadge";
+import { formatCurrencyBRL, formatCurrencyInput, parseCurrencyInput } from "../../utils/formatters";
 import { createCustomer, getCustomers } from "../../services/customerService";
 import { createSale, getSales } from "../../services/salesService";
 import { getVehicles } from "../../services/vehicleService";
@@ -75,6 +77,7 @@ export default function Sales() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [saleSuccessData, setSaleSuccessData] = useState<Sale | null>(null);
   const [search, setSearch] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<
@@ -92,7 +95,7 @@ export default function Sales() {
       return (
         saleDate.getMonth() === currentMonth &&
         saleDate.getFullYear() === currentYear &&
-        sale.status !== "canceled"
+        sale.status === "completed"
       );
     });
 
@@ -103,9 +106,8 @@ export default function Sales() {
 
     const completedSales = sales.filter((s) => s.status === "completed");
     const averageTicket =
-      completedSales.length > 0
-        ? completedSales.reduce((sum, s) => sum + s.payment.total_value, 0) /
-          completedSales.length
+      salesThisMonth.length > 0
+        ? totalSalesThisMonth / salesThisMonth.length
         : 0;
 
     return {
@@ -117,30 +119,6 @@ export default function Sales() {
   };
 
   const stats = getSalesStats();
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
-  // Formatar valor monetário para exibição
-  const formatCurrencyInput = (value: string): string => {
-    const numbers = value.replace(/\D/g, "");
-    const amount = Number(numbers) / 100;
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  // Extrair valor numérico de string formatada
-  const parseCurrencyInput = (value: string): number => {
-    const numbers = value.replace(/\D/g, "");
-    return Number(numbers) / 100;
-  };
 
   // Form State
   const [isNewCustomer, setIsNewCustomer] = useState(false);
@@ -184,7 +162,16 @@ export default function Sales() {
     loadData();
   }, []);
 
-  // Detectar veículo pré-selecionado vindo do Inventory
+  // Detectar filtro de cliente vindo da tela de Clientes
+  useEffect(() => {
+    const state = location.state as { initialSearch?: string };
+    if (state?.initialSearch) {
+      setSearch(state.initialSearch);
+      navigate("/admin/vendas", { replace: true, state: {} });
+    }
+  }, []);
+
+  // Detectar veículo pré-selecionado vindo do Inventory ou Financiamento
   useEffect(() => {
     const state = location.state as { preSelectedVehicleId?: string };
 
@@ -482,7 +469,7 @@ export default function Sales() {
         paymentDetails.installment_value = formData.installmentValue;
       }
 
-      await createSale({
+      const createdSale = await createSale({
         vehicle_id: formData.vehicleId,
         vehicle_title: vehicle?.title || "Veículo",
         customer_id: finalCustomerId as any,
@@ -492,9 +479,10 @@ export default function Sales() {
         notes: formData.notes,
       });
 
-      // Resetar formulário e fechar modal
+      // Resetar formulário, fechar modal de venda e abrir dialog de sucesso
       resetForm();
       setIsModalOpen(false);
+      setSaleSuccessData(createdSale);
       await loadData();
     } catch (error) {
       console.error("Erro ao registrar venda:", error);
@@ -516,7 +504,7 @@ export default function Sales() {
         );
       case "financing":
         return (
-          <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-md border border-border animate-in fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-muted/50 rounded-md border border-border animate-in fade-in">
             <div className="space-y-2">
               <Label>Valor de Entrada *</Label>
               <Input
@@ -558,17 +546,17 @@ export default function Sales() {
                 </p>
               )}
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <p className="text-sm font-medium">
                 Valor Financiado:{" "}
-                {formatCurrency(formData.totalValue - formData.downPayment)}
+                {formatCurrencyBRL(formData.totalValue - formData.downPayment)}
               </p>
             </div>
           </div>
         );
       case "trade_in":
         return (
-          <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-md border border-border animate-in fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-muted/50 rounded-md border border-border animate-in fade-in">
             <div className="space-y-2">
               <Label>Veículo na Troca *</Label>
               <Input
@@ -610,10 +598,10 @@ export default function Sales() {
                 </p>
               )}
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <p className="text-sm font-medium">
                 Saldo a Pagar:{" "}
-                {formatCurrency(formData.totalValue - formData.tradeInValue)}
+                {formatCurrencyBRL(formData.totalValue - formData.tradeInValue)}
               </p>
             </div>
           </div>
@@ -646,12 +634,12 @@ export default function Sales() {
             </div>
 
             {/* 2. Valor a Parcelar e Qtd. Parcelas (lado a lado) */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Valor a Parcelar</Label>
                 <Input
                   type="text"
-                  value={formatCurrency(
+                  value={formatCurrencyBRL(
                     formData.totalValue - formData.entryValue
                   )}
                   readOnly
@@ -704,33 +692,6 @@ export default function Sales() {
     }
   };
 
-  const getMethodBadge = (method: string) => {
-    const styles: any = {
-      cash: {
-        label: "A Vista",
-        class: "bg-green-500/10 text-green-600 border-green-200",
-      },
-      financing: {
-        label: "Financiado",
-        class: "bg-blue-500/10 text-blue-600 border-blue-200",
-      },
-      trade_in: {
-        label: "Troca",
-        class: "bg-orange-500/10 text-orange-600 border-orange-200",
-      },
-      promissory: {
-        label: "Promissória",
-        class: "bg-purple-500/10 text-purple-600 border-purple-200",
-      },
-    };
-    const style = styles[method] || { label: method, class: "bg-gray-100" };
-    return (
-      <Badge variant="outline" className={style.class}>
-        {style.label}
-      </Badge>
-    );
-  };
-
   const openDetailsModal = (sale: Sale) => {
     setSelectedSale(sale);
     setIsDetailsModalOpen(true);
@@ -744,7 +705,7 @@ export default function Sales() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -758,16 +719,16 @@ export default function Sales() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Entrada:</span>
-              <span>{formatCurrency(payment.down_payment || 0)}</span>
+              <span>{formatCurrencyBRL(payment.down_payment || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Financiado:</span>
-              <span>{formatCurrency(payment.financed_amount || 0)}</span>
+              <span>{formatCurrencyBRL(payment.financed_amount || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Banco:</span>
@@ -781,7 +742,7 @@ export default function Sales() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -790,12 +751,12 @@ export default function Sales() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor da Troca:</span>
-              <span>{formatCurrency(payment.trade_in_value || 0)}</span>
+              <span>{formatCurrencyBRL(payment.trade_in_value || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Saldo a Pagar:</span>
               <span className="font-bold">
-                {formatCurrency(
+                {formatCurrencyBRL(
                   payment.total_value - (payment.trade_in_value || 0)
                 )}
               </span>
@@ -808,17 +769,17 @@ export default function Sales() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Entrada:</span>
-              <span>{formatCurrency(payment.entry_value || 0)}</span>
+              <span>{formatCurrencyBRL(payment.entry_value || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor a Parcelar:</span>
               <span>
-                {formatCurrency(
+                {formatCurrencyBRL(
                   payment.total_value - (payment.entry_value || 0)
                 )}
               </span>
@@ -830,7 +791,7 @@ export default function Sales() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor da Parcela:</span>
               <span className="font-bold">
-                {formatCurrency(payment.installment_value || 0)}
+                {formatCurrencyBRL(payment.installment_value || 0)}
               </span>
             </div>
           </div>
@@ -868,7 +829,7 @@ export default function Sales() {
               ) : (
                 <>
                   <h3 className="text-2xl font-bold text-foreground">
-                    {formatCurrency(stats.salesThisMonth)}
+                    {formatCurrencyBRL(stats.salesThisMonth)}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
                     {stats.salesThisMonthCount}{" "}
@@ -913,10 +874,10 @@ export default function Sales() {
               ) : (
                 <>
                   <h3 className="text-2xl font-bold text-foreground">
-                    {formatCurrency(stats.averageTicket)}
+                    {formatCurrencyBRL(stats.averageTicket)}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    valor médio por venda
+                    média do mês atual
                   </p>
                 </>
               )}
@@ -1017,7 +978,7 @@ export default function Sales() {
                             {sale.vehicle_title}
                           </td>
                           <td className="p-4 align-middle">
-                            {getMethodBadge(sale.payment.method)}
+                            <PaymentMethodBadge method={sale.payment.method} />
                           </td>
                           <td className="p-4 align-middle font-bold text-foreground">
                             {new Intl.NumberFormat("pt-BR", {
@@ -1082,17 +1043,17 @@ export default function Sales() {
       {/* New Sale Dialog */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent
-          className="w-full max-w-[50vw] sm:max-w-6xl lg:max-w-7xl xl:max-w-[50vw] max-h-[70vh] overflow-y-auto"
+          className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-2xl lg:max-w-4xl xl:max-w-[50vw] max-h-[90vh] sm:max-h-[85vh] overflow-y-auto p-4 sm:p-6"
           onClose={closeModal}
         >
-          <DialogHeader>
-            <DialogTitle>Registrar Nova Venda</DialogTitle>
-            <DialogDescription>
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-lg sm:text-xl">Registrar Nova Venda</DialogTitle>
+            <DialogDescription className="text-sm">
               Preencha os dados da venda abaixo.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6 py-2">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 py-2">
             {/* Erros de Validação */}
             {Object.keys(validationErrors).length > 0 && (
               <div className="p-4 rounded-md bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 dark:border-red-500/40">
@@ -1122,7 +1083,7 @@ export default function Sales() {
               <Combobox
                 options={vehicles.map((v) => ({
                   value: v.id,
-                  label: `${v.title} - ${formatCurrency(v.price)}`,
+                  label: `${v.title} - ${formatCurrencyBRL(v.price)}`,
                 }))}
                 value={formData.vehicleId}
                 onValueChange={handleVehicleSelect}
@@ -1140,7 +1101,7 @@ export default function Sales() {
 
             {/* 2. Customer Selection */}
             <div className="space-y-3 border-t border-border pt-4">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <Label className="text-foreground font-bold flex items-center gap-2">
                   <User className="h-4 w-4" /> Cliente
                 </Label>
@@ -1150,11 +1111,11 @@ export default function Sales() {
                     id="newCust"
                     checked={isNewCustomer}
                     onChange={(e) => setIsNewCustomer(e.target.checked)}
-                    className="rounded border-input text-primary focus:ring-primary"
+                    className="rounded border-input text-primary focus:ring-primary w-4 h-4"
                   />
                   <Label
                     htmlFor="newCust"
-                    className="text-xs cursor-pointer text-muted-foreground"
+                    className="text-xs sm:text-sm cursor-pointer text-muted-foreground"
                   >
                     Novo Cadastro
                   </Label>
@@ -1162,18 +1123,18 @@ export default function Sales() {
               </div>
 
               {isNewCustomer ? (
-                <div className="p-3 bg-muted/30 rounded-lg space-y-3 animate-in fade-in">
+                <div className="p-3 sm:p-4 bg-muted/30 rounded-lg space-y-3 animate-in fade-in">
                   <div>
                     <Input
                       name="newCustomerName"
                       value={formData.newCustomerName}
                       onChange={handleInputChange}
                       placeholder="Nome Completo *"
-                      className={
+                      className={`text-base ${
                         validationErrors.newCustomerName
                           ? "bg-background border-red-500 dark:border-red-400"
                           : "bg-background"
-                      }
+                      }`}
                       required
                     />
                     {validationErrors.newCustomerName && (
@@ -1182,7 +1143,7 @@ export default function Sales() {
                       </p>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <Input
                         name="newCustomerPhone"
@@ -1266,7 +1227,7 @@ export default function Sales() {
                 <CreditCard className="h-4 w-4" /> Pagamento
               </Label>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Forma de Pagamento *</Label>
                   <Select
@@ -1317,7 +1278,7 @@ export default function Sales() {
                       handleCurrencyChange("totalValue", e.target.value)
                     }
                     placeholder="R$ 0,00"
-                    className={`font-bold ${
+                    className={`text-base sm:text-lg font-bold ${
                       validationErrors.totalValue
                         ? "bg-background border-red-500 dark:border-red-400"
                         : "bg-background"
@@ -1336,28 +1297,29 @@ export default function Sales() {
             </div>
 
             <div className="space-y-2 border-t border-border pt-4">
-              <Label>Observações</Label>
+              <Label className="text-sm sm:text-base">Observações</Label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleInputChange}
-                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-primary"
+                className="flex min-h-[80px] sm:min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm sm:text-base text-foreground focus:ring-2 focus:ring-primary resize-y"
                 placeholder="Detalhes adicionais..."
               />
             </div>
 
-            <DialogFooter className="pt-4 border-t border-border mt-6">
+            <DialogFooter className="pt-4 border-t border-border mt-6 flex-col sm:flex-row gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={closeModal}
                 disabled={isSubmitting}
+                className="w-full sm:w-auto"
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto"
                 disabled={!isFormValid() || isSubmitting}
               >
                 <DollarSign className="h-4 w-4" />
@@ -1457,7 +1419,7 @@ export default function Sales() {
                     <span className="text-muted-foreground">
                       Forma de Pagamento:
                     </span>
-                    {getMethodBadge(selectedSale.payment.method)}
+                    <PaymentMethodBadge method={selectedSale.payment.method} />
                   </div>
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg">
@@ -1485,6 +1447,44 @@ export default function Sales() {
               onClick={() => setIsDetailsModalOpen(false)}
             >
               Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sale Success Dialog */}
+      <Dialog open={!!saleSuccessData} onOpenChange={(open) => !open && setSaleSuccessData(null)}>
+        <DialogContent className="sm:max-w-md" onClose={() => setSaleSuccessData(null)}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CreditCard className="h-5 w-5" /> Venda Registrada!
+            </DialogTitle>
+            <DialogDescription>
+              {saleSuccessData?.vehicle_title} vendido para{" "}
+              {saleSuccessData?.customer_name || "cliente não informado"}.
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Deseja gerar o contrato de compra e venda agora?
+          </p>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSaleSuccessData(null)}
+            >
+              Fechar
+            </Button>
+            <Button
+              className="gap-2"
+              onClick={() => {
+                if (!saleSuccessData) return;
+                navigate("/admin/contratos", {
+                  state: { saleData: saleSuccessData },
+                });
+                setSaleSuccessData(null);
+              }}
+            >
+              <FileText className="h-4 w-4" /> Gerar Contrato
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   Car,
   CheckCircle,
+  Clock,
   Copy,
   CreditCard,
   Edit,
@@ -9,10 +10,12 @@ import {
   FileText,
   Filter,
   MoreVertical,
+  Package,
   Plus,
   Search,
   Share2,
   Trash2,
+  TrendingUp,
   User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -21,32 +24,28 @@ import {
   AdminPageContainer,
   AdminPageHeader,
 } from "../../components/AdminPageComponents";
-import ImageUpload from "../../components/ImageUpload";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Combobox } from "../../components/ui/combobox";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
+  Input,
+  Skeleton,
+} from "../../components/ui/core";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
 import {
   Select,
   SelectContent,
@@ -54,30 +53,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { Skeleton } from "../../components/ui/skeleton";
-import { Textarea } from "../../components/ui/textarea";
+import PaymentMethodBadge from "../../components/PaymentMethodBadge";
+import { COLOR_OPTIONS } from "../../constants/colors";
+import { formatCurrencyBRL } from "../../utils/formatters";
 import { cn } from "../../lib/utils";
-import { getBrands, getModels } from "../../services/brandService";
 import { getSaleByVehicleId } from "../../services/salesService";
 import {
-  createVehicle,
   deleteVehicle,
   getVehicles,
   updateVehicle,
 } from "../../services/vehicleService";
-import { Brand, Model, PaymentDetails, Sale, Vehicle } from "../../types";
-import { validateVehicle } from "../../validations/vehicleSchema";
+import { PaymentDetails, Sale, Vehicle } from "../../types";
 
 export default function Inventory() {
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   // Filters
   const [priceFilter, setPriceFilter] = useState<"all" | "8k" | "10k" | "15k">(
-    "all"
+    "all",
   );
   const [typeFilter, setTypeFilter] = useState<"all" | "carro" | "moto">("all");
   const [statusFilter, setStatusFilter] = useState<
@@ -97,51 +93,6 @@ export default function Inventory() {
     useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
-  // Form State
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Partial<Vehicle>>({
-    type: "carro",
-    brand_id: "",
-    model_id: "",
-    brand: "",
-    model: "",
-    price: 0,
-    year: new Date().getFullYear(),
-    mileage: 0,
-    color: "",
-    description: "",
-    images: [],
-    plate_end: "",
-    status: "available",
-  });
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
-
-  // Brands and Models State
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [models, setModels] = useState<Model[]>([]);
-  const [loadingBrands, setLoadingBrands] = useState(false);
-  const [loadingModels, setLoadingModels] = useState(false);
-
-  // Cores pré-definidas
-  const colorOptions = [
-    { value: "Preto", label: "Preto" },
-    { value: "Branco", label: "Branco" },
-    { value: "Prata", label: "Prata" },
-    { value: "Cinza", label: "Cinza" },
-    { value: "Vermelho", label: "Vermelho" },
-    { value: "Azul", label: "Azul" },
-    { value: "Verde", label: "Verde" },
-    { value: "Amarelo", label: "Amarelo" },
-    { value: "Laranja", label: "Laranja" },
-    { value: "Marrom", label: "Marrom" },
-    { value: "Bege", label: "Bege" },
-    { value: "Dourado", label: "Dourado" },
-    { value: "Roxo", label: "Roxo" },
-    { value: "Rosa", label: "Rosa" },
-  ];
-
   const loadData = () => {
     setLoading(true);
     getVehicles().then((data) => {
@@ -154,52 +105,12 @@ export default function Inventory() {
     loadData();
   }, []);
 
-  // Recarregar marcas quando o tipo mudar
-  useEffect(() => {
-    if (isModalOpen) {
-      loadBrands();
-    }
-  }, [formData.type, isModalOpen]);
-
-  // Carregar marcas baseado no tipo
-  const loadBrands = async () => {
-    setLoadingBrands(true);
-    try {
-      const data = await getBrands(formData.type as "carro" | "moto");
-      setBrands(data);
-    } catch (error) {
-      console.error("Erro ao carregar marcas:", error);
-    } finally {
-      setLoadingBrands(false);
-    }
-  };
-
-  // Carregar modelos quando marca for selecionada
-  const loadModels = async (
-    brandId: string,
-    vehicleType?: "carro" | "moto"
-  ) => {
-    if (!brandId) {
-      setModels([]);
-      return;
-    }
-    setLoadingModels(true);
-    try {
-      const type = vehicleType || formData.type;
-      const data = await getModels(brandId, type as "carro" | "moto");
-      setModels(data);
-    } catch (error) {
-      console.error("Erro ao carregar modelos:", error);
-    } finally {
-      setLoadingModels(false);
-    }
-  };
 
   // Gerar título automaticamente
   const generateTitle = (
     brand: string,
     model: string,
-    year: number
+    year: number,
   ): string => {
     return `${brand} ${model} ${year}`.trim();
   };
@@ -237,40 +148,6 @@ export default function Inventory() {
     setIsVehicleDetailsModalOpen(true);
   };
 
-  const formatPaymentCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
-  const getMethodBadge = (method: string) => {
-    const styles: any = {
-      cash: {
-        label: "A Vista",
-        class: "bg-green-500/10 text-green-600 border-green-200",
-      },
-      financing: {
-        label: "Financiado",
-        class: "bg-blue-500/10 text-blue-600 border-blue-200",
-      },
-      trade_in: {
-        label: "Troca",
-        class: "bg-orange-500/10 text-orange-600 border-orange-200",
-      },
-      promissory: {
-        label: "Promissória",
-        class: "bg-purple-500/10 text-purple-600 border-purple-200",
-      },
-    };
-    const style = styles[method] || { label: method, class: "bg-gray-100" };
-    return (
-      <Badge variant="outline" className={style.class}>
-        {style.label}
-      </Badge>
-    );
-  };
-
   const renderPaymentDetails = (payment: PaymentDetails) => {
     switch (payment.method) {
       case "cash":
@@ -279,7 +156,7 @@ export default function Inventory() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -293,16 +170,16 @@ export default function Inventory() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Entrada:</span>
-              <span>{formatPaymentCurrency(payment.down_payment || 0)}</span>
+              <span>{formatCurrencyBRL(payment.down_payment || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Financiado:</span>
-              <span>{formatPaymentCurrency(payment.financed_amount || 0)}</span>
+              <span>{formatCurrencyBRL(payment.financed_amount || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Banco:</span>
@@ -316,7 +193,7 @@ export default function Inventory() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -325,13 +202,13 @@ export default function Inventory() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor da Troca:</span>
-              <span>{formatPaymentCurrency(payment.trade_in_value || 0)}</span>
+              <span>{formatCurrencyBRL(payment.trade_in_value || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Saldo a Pagar:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(
-                  payment.total_value - (payment.trade_in_value || 0)
+                {formatCurrencyBRL(
+                  payment.total_value - (payment.trade_in_value || 0),
                 )}
               </span>
             </div>
@@ -343,18 +220,18 @@ export default function Inventory() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor Total:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(payment.total_value)}
+                {formatCurrencyBRL(payment.total_value)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Entrada:</span>
-              <span>{formatPaymentCurrency(payment.entry_value || 0)}</span>
+              <span>{formatCurrencyBRL(payment.entry_value || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor a Parcelar:</span>
               <span>
-                {formatPaymentCurrency(
-                  payment.total_value - (payment.entry_value || 0)
+                {formatCurrencyBRL(
+                  payment.total_value - (payment.entry_value || 0),
                 )}
               </span>
             </div>
@@ -365,7 +242,7 @@ export default function Inventory() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Valor da Parcela:</span>
               <span className="font-bold">
-                {formatPaymentCurrency(payment.installment_value || 0)}
+                {formatCurrencyBRL(payment.installment_value || 0)}
               </span>
             </div>
           </div>
@@ -390,256 +267,6 @@ export default function Inventory() {
     }
   };
 
-  const openNewModal = () => {
-    setEditingId(null);
-    setValidationErrors({});
-    setModels([]);
-    setFormData({
-      type: "carro",
-      brand_id: "",
-      model_id: "",
-      brand: "",
-      model: "",
-      price: 0,
-      year: new Date().getFullYear(),
-      mileage: undefined,
-      color: "",
-      description: "",
-      images: [],
-      plate_end: "",
-    });
-    loadBrands();
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = async (vehicle: Vehicle) => {
-    setEditingId(vehicle.id);
-    setValidationErrors({});
-
-    setFormData({
-      type: vehicle.type,
-      brand_id: vehicle.brand_id || "",
-      model_id: vehicle.model_id || "",
-      brand: vehicle.brand || "",
-      model: vehicle.model || "",
-      price: vehicle.price,
-      year: vehicle.year,
-      mileage: vehicle.mileage,
-      color: vehicle.color || "",
-      description: vehicle.description,
-      images: vehicle.images || [],
-      plate_end: vehicle.plate_end || "",
-    });
-
-    // Carregar marcas baseado no tipo do veículo
-    setLoadingBrands(true);
-    try {
-      const brandsData = await getBrands(vehicle.type as "carro" | "moto");
-      setBrands(brandsData);
-    } catch (error) {
-      console.error("Erro ao carregar marcas:", error);
-    } finally {
-      setLoadingBrands(false);
-    }
-
-    // Se tiver brand_id, carregar modelos baseado no tipo
-    if (vehicle.brand_id) {
-      await loadModels(vehicle.brand_id, vehicle.type as "carro" | "moto");
-    }
-
-    setIsModalOpen(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Limpar erros anteriores
-    setValidationErrors({});
-
-    // Preparar dados para validação (garantir que valores vazios sejam undefined)
-    const dataToValidate = {
-      ...formData,
-      brand_id:
-        formData.brand_id && formData.brand_id.trim() !== ""
-          ? formData.brand_id
-          : undefined,
-      model_id:
-        formData.model_id && formData.model_id.trim() !== ""
-          ? formData.model_id
-          : undefined,
-      price: formData.price && formData.price > 0 ? formData.price : undefined,
-      year: formData.year && formData.year > 0 ? formData.year : undefined,
-      mileage:
-        formData.mileage !== undefined && formData.mileage >= 0
-          ? formData.mileage
-          : undefined,
-      images:
-        formData.images && formData.images.length > 0 ? formData.images : [],
-      status: "available",
-    };
-
-    // Validar com Yup
-    const { isValid, errors } = await validateVehicle(dataToValidate);
-
-    if (!isValid) {
-      setValidationErrors(errors);
-
-      // Rolar para o topo do modal para ver os erros
-      setTimeout(() => {
-        const modalContent = document.querySelector('[role="dialog"]');
-        if (modalContent) {
-          modalContent.scrollTop = 0;
-        }
-      }, 100);
-
-      return;
-    }
-
-    try {
-      // Gerar título automaticamente antes de salvar
-      const titleToSave = generateTitle(
-        formData.brand || "",
-        formData.model || "",
-        formData.year || new Date().getFullYear()
-      );
-
-      const vehicleData = {
-        ...formData,
-        title: titleToSave,
-        status: editingId ? formData.status : "available",
-      };
-
-      if (editingId) {
-        await updateVehicle(editingId, vehicleData);
-      } else {
-        await createVehicle(vehicleData as any);
-      }
-
-      setIsModalOpen(false);
-      setValidationErrors({});
-      loadData();
-    } catch (error) {
-      console.error("Erro ao salvar veículo:", error);
-      alert("Erro ao salvar veículo. Tente novamente.");
-    }
-  };
-
-  const handleInputChange = async (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-
-    // Limpar erro do campo quando o usuário começar a digitar
-    if (validationErrors[name]) {
-      const newErrors = { ...validationErrors };
-      delete newErrors[name];
-      setValidationErrors(newErrors);
-    }
-
-    // Se o tipo mudar, recarregar marcas
-    if (name === "type") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        brand_id: "",
-        model_id: "",
-        brand: "",
-        model: "",
-      }));
-      setModels([]);
-      await loadBrands();
-      return;
-    }
-
-    // Se a marca mudar, carregar modelos e limpar modelo selecionado
-    if (name === "brand_id") {
-      const selectedBrand = brands.find((b) => b.id === value);
-      setFormData((prev) => ({
-        ...prev,
-        brand_id: value,
-        brand: selectedBrand?.name || "",
-        model_id: "",
-        model: "",
-      }));
-      setModels([]);
-      if (value) {
-        await loadModels(value, formData.type as "carro" | "moto");
-      }
-      return;
-    }
-
-    // Se o modelo mudar, atualizar nome do modelo
-    if (name === "model_id") {
-      const selectedModel = models.find((m) => m.id === value);
-      setFormData((prev) => ({
-        ...prev,
-        model_id: value,
-        model: selectedModel?.name || "",
-      }));
-      return;
-    }
-
-    setFormData((prev) => {
-      const updatedData = {
-        ...prev,
-        [name]:
-          name === "price" || name === "year" || name === "mileage"
-            ? value === ""
-              ? undefined
-              : Number(value)
-            : value,
-      };
-
-      // Gerar título automaticamente quando brand, model ou year mudarem
-      if (name === "year" && updatedData.brand && updatedData.model) {
-        updatedData.title = generateTitle(
-          updatedData.brand,
-          updatedData.model,
-          updatedData.year || new Date().getFullYear()
-        );
-      }
-
-      return updatedData;
-    });
-  };
-
-  // Função para formatar preço em reais
-  const formatCurrency = (value: number | undefined): string => {
-    if (!value || value === 0) return "";
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  // Função para converter valor formatado para número
-  const parseCurrency = (value: string): number => {
-    const numbers = value.replace(/\D/g, "");
-    if (!numbers) return 0;
-    return parseInt(numbers, 10) / 100;
-  };
-
-  // Handler específico para preço com máscara
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const numericValue = parseCurrency(inputValue);
-
-    setFormData((prev) => ({
-      ...prev,
-      price: numericValue,
-    }));
-
-    // Limpar erro do campo
-    if (validationErrors.price) {
-      const newErrors = { ...validationErrors };
-      delete newErrors.price;
-      setValidationErrors(newErrors);
-    }
-  };
 
   // Filter Logic
   const filteredVehicles = vehicles.filter((v) => {
@@ -660,6 +287,23 @@ export default function Inventory() {
     return matchesSearch && matchesPrice && matchesType && matchesStatus;
   });
 
+  const getDaysInStock = (vehicle: Vehicle): number => {
+    const created = new Date(vehicle.created_at);
+    const now = new Date();
+    return Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const getInventoryStats = () => {
+    const available = vehicles.filter((v) => (v.status || "available") === "available");
+    const totalValue = available.reduce((sum, v) => sum + v.price, 0);
+    const maxDays = available.length > 0
+      ? Math.max(...available.map((v) => getDaysInStock(v)))
+      : 0;
+    return { availableCount: available.length, totalValue, maxDays };
+  };
+
+  const inventoryStats = getInventoryStats();
+
   const handleShareList = () => {
     const header = `📋 *LISTA DE VEÍCULOS* 📋\n\n`;
     const body = filteredVehicles
@@ -668,7 +312,7 @@ export default function Inventory() {
           `🚗 *${v.title}* (${v.year})\n💰 ${new Intl.NumberFormat("pt-BR", {
             style: "currency",
             currency: "BRL",
-          }).format(v.price)}\n`
+          }).format(v.price)}\n`,
       )
       .join("\n------------------\n");
 
@@ -703,7 +347,7 @@ export default function Inventory() {
               <Share2 className="h-4 w-4" /> Compartilhar Lista
             </Button>
             <Button
-              onClick={openNewModal}
+              onClick={() => navigate("/admin/estoque/novo")}
               className="flex-1 md:flex-initial gap-2 shadow-md"
             >
               <Plus className="h-4 w-4" /> Novo Veículo
@@ -711,6 +355,54 @@ export default function Inventory() {
           </>
         }
       />
+
+      {/* KPIs de Estoque */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-card border-border">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-blue-500/10 text-blue-500">
+              <Package className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Disponíveis</p>
+              <h3 className="text-2xl font-bold text-foreground">
+                {loading ? "—" : inventoryStats.availableCount}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">veículos em estoque</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-green-500/10 text-green-500">
+              <TrendingUp className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Valor do Estoque</p>
+              <h3 className="text-2xl font-bold text-foreground">
+                {loading ? "—" : new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(inventoryStats.totalValue)}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">soma dos disponíveis</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className={`bg-card border-border ${!loading && inventoryStats.maxDays > 60 ? "border-orange-500/40" : ""}`}>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className={`p-3 rounded-full ${!loading && inventoryStats.maxDays > 60 ? "bg-orange-500/10 text-orange-500" : "bg-muted text-muted-foreground"}`}>
+              <Clock className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Mais Tempo Parado</p>
+              <h3 className={`text-2xl font-bold ${!loading && inventoryStats.maxDays > 60 ? "text-orange-500" : "text-foreground"}`}>
+                {loading ? "—" : `${inventoryStats.maxDays}d`}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {!loading && inventoryStats.maxDays > 60 ? "atenção: veículo parado" : "dias em estoque"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Filtros */}
       <Card className="bg-card border-border shadow-sm">
@@ -762,7 +454,7 @@ export default function Inventory() {
           </div>
 
           {/* Filtros organizados */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border/50">
             {/* Filtro de Preço */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -820,14 +512,14 @@ export default function Inventory() {
                   className="cursor-pointer hover:scale-105 transition-transform"
                   onClick={() => setTypeFilter("carro")}
                 >
-                  🚗 Carros
+                  Carros
                 </Badge>
                 <Badge
                   variant={typeFilter === "moto" ? "default" : "outline"}
                   className="cursor-pointer hover:scale-105 transition-transform"
                   onClick={() => setTypeFilter("moto")}
                 >
-                  🏍️ Motos
+                  Motos
                 </Badge>
               </div>
             </div>
@@ -851,7 +543,7 @@ export default function Inventory() {
                     "cursor-pointer hover:scale-105 transition-transform",
                     statusFilter === "available"
                       ? "bg-green-500 hover:bg-green-600 text-white border-green-500"
-                      : "border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                      : "border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950",
                   )}
                   variant={statusFilter === "available" ? "default" : "outline"}
                   onClick={() => setStatusFilter("available")}
@@ -863,7 +555,7 @@ export default function Inventory() {
                     "cursor-pointer hover:scale-105 transition-transform",
                     statusFilter === "sold"
                       ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
-                      : "border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                      : "border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950",
                   )}
                   variant={statusFilter === "sold" ? "default" : "outline"}
                   onClick={() => setStatusFilter("sold")}
@@ -875,7 +567,8 @@ export default function Inventory() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full overflow-auto">
+          {/* Desktop Table View */}
+          <div className="hidden lg:block relative w-full overflow-auto">
             <table className="w-full caption-bottom text-sm text-left">
               <thead className="[&_tr]:border-b">
                 <tr className="border-b border-border transition-colors hover:bg-muted/50">
@@ -954,7 +647,12 @@ export default function Inventory() {
                         />
                       </td>
                       <td className="p-4 align-middle font-medium text-foreground min-w-[150px]">
-                        {vehicle.title}
+                        <div>{vehicle.title}</div>
+                        {vehicle.status !== "sold" && (
+                          <p className={`text-xs mt-0.5 ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}>
+                            {getDaysInStock(vehicle)} dias em estoque
+                          </p>
+                        )}
                       </td>
                       <td className="p-4 align-middle capitalize text-muted-foreground">
                         {vehicle.type}
@@ -1026,7 +724,7 @@ export default function Inventory() {
                               <Copy className="h-4 w-4" /> Compartilhar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => openEditModal(vehicle)}
+                              onClick={() => navigate(`/admin/estoque/editar/${vehicle.id}`)}
                               className="flex items-center gap-2"
                             >
                               <Edit className="h-4 w-4" /> Editar
@@ -1054,6 +752,152 @@ export default function Inventory() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile/Tablet Card View */}
+          <div className="lg:hidden space-y-4">
+            {loading ? (
+              [1, 2, 3, 4].map((i) => (
+                <Card key={i} className="bg-card border-border">
+                  <CardContent className="p-4">
+                    <div className="flex gap-4">
+                      <Skeleton className="h-20 w-28 rounded" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-4 w-1/3" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : filteredVehicles.length > 0 ? (
+              filteredVehicles.map((vehicle) => (
+                <Card
+                  key={vehicle.id}
+                  className="bg-card border-border hover:border-primary/50 transition-colors"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex gap-4">
+                      <img
+                        src={vehicle.images?.[0]}
+                        alt={vehicle.title}
+                        className="h-20 w-28 object-cover rounded bg-muted border border-border flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-foreground text-sm line-clamp-2 flex-1">
+                            {vehicle.title}
+                          </h3>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleViewVehicleDetails(vehicle)}
+                                className="flex items-center gap-2"
+                              >
+                                <Eye className="h-4 w-4" /> Ver Detalhes
+                              </DropdownMenuItem>
+                              {vehicle.status === "sold" ? (
+                                <>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleViewSaleDetails(vehicle.id)
+                                    }
+                                    className="flex items-center gap-2 text-primary hover:bg-primary/10 focus:bg-primary/10"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                    Ver Detalhes da Venda
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleMarkAvailable(vehicle.id)
+                                    }
+                                    className="flex items-center gap-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 focus:bg-blue-50 focus:text-blue-700"
+                                  >
+                                    <CheckCircle className="h-4 w-4" />
+                                    Marcar como disponível
+                                  </DropdownMenuItem>
+                                </>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => handleSellVehicle(vehicle.id)}
+                                  className="flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-950 hover:text-green-700 focus:bg-green-50 focus:text-green-700"
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                  Registrar Venda
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() => handleShareVehicle(vehicle)}
+                                className="flex items-center gap-2"
+                              >
+                                <Copy className="h-4 w-4" /> Compartilhar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/admin/estoque/editar/${vehicle.id}`)}
+                                className="flex items-center gap-2"
+                              >
+                                <Edit className="h-4 w-4" /> Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setVehicleToDelete(vehicle.id)}
+                                className="flex items-center gap-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-700 focus:bg-red-50 focus:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" /> Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <Badge
+                            variant="outline"
+                            className="capitalize text-xs"
+                          >
+                            {vehicle.type}
+                          </Badge>
+                          <Badge
+                            variant="secondary"
+                            className={`capitalize text-xs ${
+                              vehicle.status === "sold"
+                                ? "bg-red-500/10 text-red-600"
+                                : "bg-green-500/10 text-green-600"
+                            }`}
+                          >
+                            {vehicle.status === "sold" ? "vendido" : "disponível"}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-semibold text-foreground text-base">
+                            {new Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            }).format(vehicle.price)}
+                          </p>
+                          {vehicle.status !== "sold" && (
+                            <p className={`text-xs ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}>
+                              {getDaysInStock(vehicle)}d em estoque
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="p-8 text-center text-muted-foreground">
+                Nenhum veículo encontrado.
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -1103,352 +947,6 @@ export default function Inventory() {
         </DialogContent>
       </Dialog>
 
-      {/* Create/Edit Vehicle Dialog */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent
-          className="w-full max-w-[50vw] sm:max-w-6xl lg:max-w-7xl xl:max-w-[50vw] max-h-[70vh] overflow-y-auto"
-          onClose={() => setIsModalOpen(false)}
-        >
-          <DialogHeader>
-            <DialogTitle>
-              {editingId ? "Editar Veículo" : "Adicionar Veículo"}
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os detalhes do veículo abaixo.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmit} className="space-y-4 py-2">
-            {/* Erros de Validação */}
-            {Object.keys(validationErrors).length > 0 && (
-              <div className="p-4 rounded-md bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 dark:border-red-500/40">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">
-                      Corrija os seguintes erros:
-                    </h3>
-                    <ul className="text-sm text-red-600 dark:text-red-300 list-disc list-inside space-y-1">
-                      {Object.entries(validationErrors).map(
-                        ([field, error]) => (
-                          <li key={field}>{error}</li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Imagens - Primeira posição */}
-            <div className="space-y-2">
-              <Label className="text-foreground">
-                Imagens do Veículo (Máximo 10) *
-              </Label>
-              <ImageUpload
-                images={formData.images || []}
-                onChange={(newImages) => {
-                  console.log("📸 Novas imagens recebidas:", newImages);
-                  setFormData((prev) => ({ ...prev, images: newImages }));
-                }}
-                vehicleId={editingId || undefined}
-              />
-              {validationErrors.images && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {validationErrors.images}
-                </p>
-              )}
-            </div>
-
-            {/* Categoria */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Categoria *</Label>
-              <Select
-                name="type"
-                value={formData.type}
-                onValueChange={(value) =>
-                  handleInputChange({
-                    target: { name: "type", value },
-                  } as React.ChangeEvent<HTMLSelectElement>)
-                }
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="carro">Carro</SelectItem>
-                  <SelectItem value="moto">Moto</SelectItem>
-                </SelectContent>
-              </Select>
-              {validationErrors.type && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {validationErrors.type}
-                </p>
-              )}
-            </div>
-
-            {/* Marca e Modelo - Combobox com busca */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-foreground">Marca/Fabricante *</Label>
-                <Combobox
-                  options={brands.map((brand) => ({
-                    value: brand.id,
-                    label: brand.name,
-                  }))}
-                  value={formData.brand_id || ""}
-                  onValueChange={(value) => {
-                    const selectedBrand = brands.find((b) => b.id === value);
-                    setFormData((prev) => ({
-                      ...prev,
-                      brand_id: value,
-                      brand: selectedBrand?.name || "",
-                      model_id: "",
-                      model: "",
-                    }));
-                    setModels([]);
-                    if (value) {
-                      loadModels(value, formData.type as "carro" | "moto");
-                    }
-                    if (validationErrors.brand_id || validationErrors.brand) {
-                      const newErrors = { ...validationErrors };
-                      delete newErrors.brand_id;
-                      delete newErrors.brand;
-                      setValidationErrors(newErrors);
-                    }
-                  }}
-                  placeholder={
-                    loadingBrands ? "Carregando..." : "Selecione a marca"
-                  }
-                  searchPlaceholder="Buscar marca..."
-                  disabled={loadingBrands}
-                  error={
-                    !!(validationErrors.brand_id || validationErrors.brand)
-                  }
-                />
-                {(validationErrors.brand_id || validationErrors.brand) && (
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {validationErrors.brand_id || validationErrors.brand}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-foreground">Modelo *</Label>
-                <Combobox
-                  options={models.map((model) => ({
-                    value: model.id,
-                    label: model.name,
-                  }))}
-                  value={formData.model_id || ""}
-                  onValueChange={(value) => {
-                    const selectedModel = models.find((m) => m.id === value);
-                    setFormData((prev) => ({
-                      ...prev,
-                      model_id: value,
-                      model: selectedModel?.name || "",
-                    }));
-                    if (validationErrors.model_id || validationErrors.model) {
-                      const newErrors = { ...validationErrors };
-                      delete newErrors.model_id;
-                      delete newErrors.model;
-                      setValidationErrors(newErrors);
-                    }
-                  }}
-                  placeholder={
-                    !formData.brand_id
-                      ? "Selecione a marca primeiro"
-                      : loadingModels
-                      ? "Carregando..."
-                      : "Selecione o modelo"
-                  }
-                  searchPlaceholder="Buscar modelo..."
-                  disabled={!formData.brand_id || loadingModels}
-                  error={
-                    !!(validationErrors.model_id || validationErrors.model)
-                  }
-                />
-                {(validationErrors.model_id || validationErrors.model) && (
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {validationErrors.model_id || validationErrors.model}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-foreground">Preço (R$) *</Label>
-              <Input
-                type="text"
-                name="price"
-                value={formatCurrency(formData.price)}
-                onChange={handlePriceChange}
-                placeholder="R$ 0,00"
-                required
-                className={
-                  validationErrors.price
-                    ? "bg-background border-red-500 dark:border-red-400 text-foreground"
-                    : "bg-background border-input text-foreground"
-                }
-              />
-              {validationErrors.price && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {validationErrors.price}
-                </p>
-              )}
-            </div>
-
-            {/* Ano e Quilometragem */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-foreground">Ano *</Label>
-                <Select
-                  value={formData.year?.toString()}
-                  onValueChange={(value) =>
-                    handleInputChange({
-                      target: { name: "year", value },
-                    } as React.ChangeEvent<HTMLSelectElement>)
-                  }
-                  required
-                >
-                  <SelectTrigger
-                    className={
-                      validationErrors.year
-                        ? "bg-background border-red-500 dark:border-red-400 text-foreground"
-                        : "bg-background border-input text-foreground"
-                    }
-                  >
-                    <SelectValue placeholder="Selecione o ano" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {Array.from(
-                      { length: new Date().getFullYear() + 1 - 1980 + 1 },
-                      (_, i) => new Date().getFullYear() + 1 - i
-                    ).map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {validationErrors.year && (
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {validationErrors.year}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-foreground">Quilometragem (km) *</Label>
-                <Input
-                  type="number"
-                  name="mileage"
-                  value={formData.mileage === undefined ? "" : formData.mileage}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  placeholder="0"
-                  className={
-                    validationErrors.mileage
-                      ? "bg-background border-red-500 dark:border-red-400 text-foreground"
-                      : "bg-background border-input text-foreground"
-                  }
-                />
-                {validationErrors.mileage && (
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {validationErrors.mileage}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Cor e Placa */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-foreground">Cor</Label>
-                <Combobox
-                  options={colorOptions}
-                  value={formData.color || ""}
-                  onValueChange={(value) => {
-                    setFormData((prev) => ({ ...prev, color: value }));
-                  }}
-                  placeholder="Selecione a cor"
-                  searchPlaceholder="Buscar cor..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-foreground">Placa</Label>
-                <Input
-                  name="plate_end"
-                  value={formData.plate_end}
-                  onChange={(e) => {
-                    const value = e.target.value
-                      .replace(/[^a-zA-Z0-9]/g, "")
-                      .toUpperCase();
-                    setFormData((prev) => ({ ...prev, plate_end: value }));
-                  }}
-                  placeholder="Ex: ABC1234"
-                  maxLength={7}
-                  className="bg-background border-input text-foreground uppercase"
-                />
-              </div>
-            </div>
-
-            {/* Descrição */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Descrição</Label>
-              <Textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Descreva detalhes adicionais do veículo, equipamentos, estado de conservação, histórico, etc."
-                className={
-                  validationErrors.description
-                    ? "border-red-500 dark:border-red-400"
-                    : ""
-                }
-              />
-              {validationErrors.description && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {validationErrors.description}
-                </p>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                disabled={
-                  !formData.type ||
-                  !formData.brand_id ||
-                  (typeof formData.brand_id === "string" &&
-                    formData.brand_id.trim() === "") ||
-                  !formData.model_id ||
-                  (typeof formData.model_id === "string" &&
-                    formData.model_id.trim() === "") ||
-                  !formData.price ||
-                  formData.price <= 0 ||
-                  !formData.year ||
-                  formData.year <= 0 ||
-                  formData.mileage === undefined ||
-                  formData.mileage < 0 ||
-                  !formData.images ||
-                  formData.images.length === 0
-                }
-              >
-                Salvar
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
       {/* Sale Details Dialog */}
       <Dialog
         open={isSaleDetailsModalOpen}
@@ -1483,7 +981,7 @@ export default function Inventory() {
                     </span>
                     <span className="font-medium">
                       {new Date(selectedSale.created_at).toLocaleString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </span>
                   </div>
@@ -1494,15 +992,15 @@ export default function Inventory() {
                         selectedSale.status === "completed"
                           ? "default"
                           : selectedSale.status === "pending"
-                          ? "secondary"
-                          : "destructive"
+                            ? "secondary"
+                            : "destructive"
                       }
                     >
                       {selectedSale.status === "completed"
                         ? "Concluída"
                         : selectedSale.status === "pending"
-                        ? "Pendente"
-                        : "Cancelada"}
+                          ? "Pendente"
+                          : "Cancelada"}
                     </Badge>
                   </div>
                 </div>
@@ -1548,7 +1046,7 @@ export default function Inventory() {
                     <span className="text-muted-foreground">
                       Forma de Pagamento:
                     </span>
-                    {getMethodBadge(selectedSale.payment.method)}
+                    <PaymentMethodBadge method={selectedSale.payment.method} />
                   </div>
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg">
@@ -1744,7 +1242,7 @@ export default function Inventory() {
                   <span className="text-muted-foreground">Cadastrado em:</span>
                   <span className="font-medium">
                     {new Date(selectedVehicle.created_at).toLocaleString(
-                      "pt-BR"
+                      "pt-BR",
                     )}
                   </span>
                 </div>
@@ -1763,7 +1261,7 @@ export default function Inventory() {
               <Button
                 onClick={() => {
                   setIsVehicleDetailsModalOpen(false);
-                  openEditModal(selectedVehicle);
+                  navigate(`/admin/estoque/editar/${selectedVehicle.id}`);
                 }}
               >
                 <Edit className="h-4 w-4 mr-2" />

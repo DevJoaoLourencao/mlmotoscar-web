@@ -21,7 +21,9 @@ import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import VehicleDetails from "./pages/VehicleDetails";
 import AdminLayout from "./pages/admin/AdminLayout";
+import AddVehicle from "./pages/admin/AddVehicle";
 import AdsGenerator from "./pages/admin/AdsGenerator";
+import Contracts from "./pages/admin/Contracts";
 import Customers from "./pages/admin/Customers";
 import Financing from "./pages/admin/Financing";
 import Inventory from "./pages/admin/Inventory";
@@ -31,6 +33,7 @@ import Sales from "./pages/admin/Sales";
 import SettingsPage from "./pages/admin/Settings";
 import { getSales } from "./services/salesService";
 import { getVehicles } from "./services/vehicleService";
+import { formatCurrencyBRL } from "./utils/formatters";
 
 // Layout for public pages
 const PublicLayout = () => (
@@ -73,7 +76,7 @@ const AdminDashboard = () => {
         // Calcular estatísticas de veículos
         const totalVehicles = vehicles.length;
         const availableVehicles = vehicles.filter(
-          (v) => v.status === "available"
+          (v) => v.status === "available",
         ).length;
         const totalValue = vehicles
           .filter((v) => v.status === "available")
@@ -99,7 +102,7 @@ const AdminDashboard = () => {
 
         const salesValueThisMonth = salesThisMonth.reduce(
           (sum, sale) => sum + sale.payment.total_value,
-          0
+          0,
         );
 
         setStats({
@@ -120,35 +123,28 @@ const AdminDashboard = () => {
     loadDashboardData();
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Dashboard Geral</h1>
-        <p className="text-muted-foreground hidden md:block">
+        <h1 className="text-2xl font-bold text-foreground">Dashboard Geral</h1>
+        <p className="text-sm text-muted-foreground hidden md:block">
           Bem-vindo de volta, Admin.
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total em Estoque */}
-        <div className="p-6 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 transition-all hover:-translate-y-1 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="p-6 pr-8 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 transition-all hover:-translate-y-1 relative overflow-hidden">
+          <div className="relative z-10 pr-4">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Disponíveis
             </h3>
             {loading ? (
-              <Skeleton className="h-10 w-20 mt-2" />
+              <Skeleton className="h-8 w-16 mt-2" />
             ) : (
               <>
-                <p className="text-4xl font-bold mt-2 text-foreground">
+                <p className="text-2xl font-bold mt-2 text-foreground break-words">
                   {stats.availableVehicles}
                 </p>
                 <span className="text-xs text-muted-foreground flex items-center mt-2">
@@ -157,21 +153,21 @@ const AdminDashboard = () => {
               </>
             )}
           </div>
-          <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-primary/10 to-transparent"></div>
+          <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none"></div>
         </div>
 
         {/* Valor Total Estoque */}
-        <div className="p-6 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 transition-all hover:-translate-y-1 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="p-6 pr-8 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 transition-all hover:-translate-y-1 relative overflow-hidden">
+          <div className="relative z-10 pr-4">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Valor em Estoque
             </h3>
             {loading ? (
-              <Skeleton className="h-10 w-32 mt-2" />
+              <Skeleton className="h-8 w-32 mt-2" />
             ) : (
               <>
-                <p className="text-3xl font-bold mt-2 text-primary">
-                  {formatCurrency(stats.totalValue)}
+                <p className="text-xl font-bold mt-2 text-primary break-words overflow-wrap-anywhere">
+                  {formatCurrencyBRL(stats.totalValue)}
                 </p>
                 <span className="text-xs text-muted-foreground flex items-center mt-2">
                   Veículos disponíveis
@@ -179,20 +175,20 @@ const AdminDashboard = () => {
               </>
             )}
           </div>
-          <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-blue-500/10 to-transparent"></div>
+          <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-blue-500/10 to-transparent pointer-events-none"></div>
         </div>
 
         {/* Vendas do Mês */}
-        <div className="p-6 rounded-xl bg-card border border-border shadow-sm hover:border-green-500/50 transition-all hover:-translate-y-1 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="p-6 pr-8 rounded-xl bg-card border border-border shadow-sm hover:border-green-500/50 transition-all hover:-translate-y-1 relative overflow-hidden">
+          <div className="relative z-10 pr-4">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Vendas do Mês
             </h3>
             {loading ? (
-              <Skeleton className="h-10 w-16 mt-2" />
+              <Skeleton className="h-8 w-16 mt-2" />
             ) : (
               <>
-                <p className="text-4xl font-bold mt-2 text-green-600 dark:text-green-500">
+                <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-500 break-words">
                   {stats.salesThisMonth}
                 </p>
                 <span className="text-xs text-green-600 dark:text-green-500 flex items-center mt-2 font-medium">
@@ -202,21 +198,21 @@ const AdminDashboard = () => {
               </>
             )}
           </div>
-          <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-green-500/10 to-transparent"></div>
+          <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-green-500/10 to-transparent pointer-events-none"></div>
         </div>
 
         {/* Faturamento do Mês */}
-        <div className="p-6 rounded-xl bg-card border border-border shadow-sm hover:border-green-500/50 transition-all hover:-translate-y-1 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="p-6 pr-8 rounded-xl bg-card border border-border shadow-sm hover:border-green-500/50 transition-all hover:-translate-y-1 relative overflow-hidden">
+          <div className="relative z-10 pr-4">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Faturamento (Mês)
             </h3>
             {loading ? (
-              <Skeleton className="h-10 w-32 mt-2" />
+              <Skeleton className="h-8 w-32 mt-2" />
             ) : (
               <>
-                <p className="text-3xl font-bold mt-2 text-green-600 dark:text-green-500">
-                  {formatCurrency(stats.salesValueThisMonth)}
+                <p className="text-2xl font-bold mt-2 text-green-600 dark:text-green-500 break-words overflow-wrap-anywhere">
+                  {formatCurrencyBRL(stats.salesValueThisMonth)}
                 </p>
                 <span className="text-xs text-muted-foreground flex items-center mt-2">
                   Total em vendas
@@ -224,19 +220,19 @@ const AdminDashboard = () => {
               </>
             )}
           </div>
-          <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-green-500/10 to-transparent"></div>
+          <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-green-500/10 to-transparent pointer-events-none"></div>
         </div>
       </div>
 
       {/* Quick Access Menu */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link to="/admin/estoque">
+        <Link to="/admin/estoque/novo">
           <Button
             variant="outline"
             className="w-full h-24 flex flex-col gap-2 items-center justify-center border-border hover:border-primary bg-card hover:bg-card text-foreground"
           >
             <PlusCircle className="h-6 w-6 text-primary" />
-            <span className="font-semibold">Novo Veículo</span>
+            <span className="text-sm font-semibold">Novo Veículo</span>
           </Button>
         </Link>
         <Link to="/admin/vendas">
@@ -245,7 +241,7 @@ const AdminDashboard = () => {
             className="w-full h-24 flex flex-col gap-2 items-center justify-center border-border hover:border-green-500 bg-card hover:bg-card text-foreground"
           >
             <DollarSign className="h-6 w-6 text-green-500" />
-            <span className="font-semibold">Nova Venda</span>
+            <span className="text-sm font-semibold">Nova Venda</span>
           </Button>
         </Link>
         <Link to="/admin/clientes">
@@ -254,7 +250,7 @@ const AdminDashboard = () => {
             className="w-full h-24 flex flex-col gap-2 items-center justify-center border-border hover:border-blue-500 bg-card hover:bg-card text-foreground"
           >
             <Users className="h-6 w-6 text-blue-500" />
-            <span className="font-semibold">Clientes</span>
+            <span className="text-sm font-semibold">Clientes</span>
           </Button>
         </Link>
         <Link to="/admin/anuncios">
@@ -263,7 +259,7 @@ const AdminDashboard = () => {
             className="w-full h-24 flex flex-col gap-2 items-center justify-center border-border hover:border-purple-500 bg-card hover:bg-card text-foreground"
           >
             <ExternalLink className="h-6 w-6 text-purple-500" />
-            <span className="font-semibold">Gerar Anúncio</span>
+            <span className="text-sm font-semibold">Gerar Anúncio</span>
           </Button>
         </Link>
       </div>
@@ -289,10 +285,13 @@ function AppRoutes() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="estoque" element={<Inventory />} />
+        <Route path="estoque/novo" element={<AddVehicle />} />
+        <Route path="estoque/editar/:id" element={<AddVehicle />} />
         <Route path="vendas" element={<Sales />} />
         <Route path="pagamentos" element={<Payments />} />
         <Route path="clientes" element={<Customers />} />
         <Route path="financiamento" element={<Financing />} />
+        <Route path="contratos" element={<Contracts />} />
         <Route path="anuncios" element={<AdsGenerator />} />
         <Route path="configuracoes" element={<SettingsPage />} />
       </Route>

@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Calculator, User, Car, DollarSign, Calendar, CheckCircle2 } from 'lucide-react';
+import { Calculator, User, Car, DollarSign, Calendar, CheckCircle2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Input, Card, CardHeader, CardTitle, CardContent, Label } from '../../components/ui/core';
 import { AdminPageContainer, AdminPageHeader } from '../../components/AdminPageComponents';
 import { Customer, Vehicle } from '../../types';
 import { getCustomers } from '../../services/customerService';
 import { getVehicles } from '../../services/vehicleService';
 
+const INSTALLMENT_OPTIONS = [12, 24, 36, 48, 60];
+
 export default function Financing() {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   
@@ -22,7 +26,7 @@ export default function Financing() {
   const [manualVehicleValue, setManualVehicleValue] = useState<number>(0);
   
   // Calculation States
-  const [installments, setInstallments] = useState<36 | 48>(48);
+  const [installments, setInstallments] = useState<number>(48);
   const [result, setResult] = useState<{ total: number, monthly: number } | null>(null);
 
   useEffect(() => {
@@ -66,9 +70,9 @@ export default function Financing() {
 
   return (
     <AdminPageContainer>
-       <AdminPageHeader 
-         title="Simulador de Financiamento" 
-         description="Calcule parcelas e condições especiais para seus clientes."
+       <AdminPageHeader
+         title="Simulador de Financiamento"
+         description="Estimativa de parcelas para apresentar ao cliente. Valores aproximados — sujeitos à análise do banco."
        />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -193,21 +197,17 @@ export default function Financing() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div 
-                            onClick={() => setInstallments(36)}
-                            className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${installments === 36 ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
-                        >
-                            <span className="block text-2xl font-bold text-foreground">36x</span>
-                            <span className="text-sm text-muted-foreground">Parcelas</span>
-                        </div>
-                        <div 
-                            onClick={() => setInstallments(48)}
-                            className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${installments === 48 ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
-                        >
-                            <span className="block text-2xl font-bold text-foreground">48x</span>
-                            <span className="text-sm text-muted-foreground">Parcelas</span>
-                        </div>
+                    <div className="grid grid-cols-5 gap-2">
+                        {INSTALLMENT_OPTIONS.map((n) => (
+                          <div
+                            key={n}
+                            onClick={() => setInstallments(n)}
+                            className={`cursor-pointer rounded-xl border-2 p-3 text-center transition-all ${installments === n ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}
+                          >
+                            <span className="block text-xl font-bold text-foreground">{n}x</span>
+                            <span className="text-xs text-muted-foreground">meses</span>
+                          </div>
+                        ))}
                     </div>
 
                     <Button onClick={handleCalculate} size="lg" className="w-full mt-6 text-lg font-bold gap-2">
@@ -253,9 +253,20 @@ export default function Financing() {
                                 </div>
                             </div>
 
-                            <div className="pt-4 space-y-3">
-                                <Button className="w-full gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-black font-bold h-12">
-                                    <CheckCircle2 className="h-5 w-5" /> Enviar Proposta (WhatsApp)
+                            <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                              <p className="text-xs text-yellow-700 dark:text-yellow-400 text-center">
+                                Estimativa com taxa aproximada. Valores reais dependem da análise do banco.
+                              </p>
+                            </div>
+                            <div className="pt-2 space-y-3">
+                                <Button
+                                  className="w-full gap-2 h-12"
+                                  onClick={() => navigate("/admin/vendas", {
+                                    state: { preSelectedVehicleId: selectedVehicleId || undefined }
+                                  })}
+                                  disabled={!selectedVehicleId && !isManualVehicle}
+                                >
+                                    <ArrowRight className="h-5 w-5" /> Registrar Venda
                                 </Button>
                                 <Button variant="outline" className="w-full border-input text-foreground hover:bg-muted h-12" onClick={() => setResult(null)}>
                                     Nova Simulação
