@@ -1,4 +1,4 @@
-import { LayoutDashboard, Menu, Moon, Sun, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSettings } from "./SettingsProvider";
@@ -13,7 +13,7 @@ export default function Navbar() {
 
   const isActive = (path: string) =>
     location.pathname === path
-      ? "text-primary font-bold"
+      ? "text-primary font-semibold"
       : "text-foreground/80 hover:text-primary";
 
   // Use dynamic variable for background, or fallback to default styles if empty
@@ -64,10 +64,10 @@ export default function Navbar() {
           </Link>
           
           <div className="flex items-center gap-2 pl-4 border-l border-border">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleTheme} 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
               className="rounded-full w-9 h-9"
               aria-label="Alternar Tema"
             >
@@ -77,13 +77,6 @@ export default function Navbar() {
                 <Moon className="h-4 w-4 text-slate-700 animate-in spin-in-90 duration-300" />
               )}
             </Button>
-
-            <Link to="/admin">
-              <Button variant="outline" size="sm" className="gap-2">
-                <LayoutDashboard className="h-4 w-4" />
-                Admin
-              </Button>
-            </Link>
           </div>
         </div>
 
@@ -150,17 +143,6 @@ export default function Navbar() {
             >
               Contato
             </Link>
-            <div className="pt-2 border-t border-border">
-                <Link to="/admin" onClick={() => setIsOpen(false)}>
-                <Button
-                  variant="outline"
-                  className="w-full gap-2 justify-start"
-                >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Área Administrativa
-                </Button>
-                </Link>
-            </div>
           </div>
         </div>
       )}

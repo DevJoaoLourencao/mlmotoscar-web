@@ -32,7 +32,6 @@ export default function VehicleDetails() {
   const [isInstallmentModalOpen, setIsInstallmentModalOpen] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
-    phone: "",
     message: "Olá, tenho interesse no veículo. Por favor entre em contato.",
   });
   const [installmentForm, setInstallmentForm] = useState({
@@ -83,14 +82,13 @@ export default function VehicleDetails() {
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = `Olá, vi o ${vehicle.title} no site ${settings.storeName}.\n\n${contactForm.message}\n\n*Meus dados:*\n👤 Nome: ${contactForm.name}\n📱 Telefone: ${contactForm.phone}`;
+    const message = `Olá, vi o ${vehicle.title} no site ${settings.storeName}.\n\n${contactForm.message}\n\n*Meus dados:*\n👤 Nome: ${contactForm.name}`;
     const url = `https://wa.me/5514991569560?text=${encodeURIComponent(
       message,
     )}`;
     window.open(url, "_blank");
     setContactForm({
       name: "",
-      phone: "",
       message: "Olá, tenho interesse no veículo. Por favor entre em contato.",
     });
   };
@@ -271,7 +269,7 @@ export default function VehicleDetails() {
       {/* Vehicle Gallery */}
       {images.length > 0 && (
         <div className="w-full mt-4 md:mt-6 mb-6 md:mb-8">
-          <div className="container mx-auto px-6 md:px-10">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
               <VehicleGallery images={images} vehicleTitle={vehicle.title} />
             </div>
@@ -280,7 +278,7 @@ export default function VehicleDetails() {
       )}
 
       {/* Two Cards Layout */}
-      <div className="container mx-auto px-6 md:px-10 pb-8 md:pb-12">
+      <div className="container mx-auto px-4 md:px-6 pb-8 md:pb-12">
         <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
           {/* Vehicle Details Card */}
           <Card className="bg-card border-border !shadow-sm hover:!shadow-sm hover:!translate-y-0 !transition-none">
@@ -317,7 +315,7 @@ export default function VehicleDetails() {
               {/* Specifications Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-5 md:mb-6">
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Ano
                   </p>
                   <p className="text-sm md:text-base font-medium text-white">
@@ -325,7 +323,7 @@ export default function VehicleDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Quilometragem
                   </p>
                   <p className="text-sm md:text-base font-medium text-foreground">
@@ -333,7 +331,7 @@ export default function VehicleDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Cor
                   </p>
                   <p className="text-sm md:text-base font-medium text-foreground">
@@ -341,7 +339,7 @@ export default function VehicleDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Tipo
                   </p>
                   <p className="text-sm md:text-base font-medium text-foreground capitalize">
@@ -349,7 +347,7 @@ export default function VehicleDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Marca
                   </p>
                   <p className="text-sm md:text-base font-medium text-foreground">
@@ -357,7 +355,7 @@ export default function VehicleDetails() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">
                     Modelo
                   </p>
                   <p className="text-sm md:text-base font-medium text-white">
@@ -408,48 +406,29 @@ export default function VehicleDetails() {
 
               {/* Contact Form */}
               <div>
-                <h3 className="text-sm md:text-base font-bold mb-3 md:mb-4 text-foreground">
+                <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-foreground">
                   Envie uma mensagem ao vendedor
                 </h3>
                 <form
                   onSubmit={handleContactSubmit}
                   className="space-y-3 md:space-y-4"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                    <div>
-                      <Label
-                        htmlFor="contact-name"
-                        className="text-xs md:text-sm"
-                      >
-                        Nome*
-                      </Label>
-                      <Input
-                        id="contact-name"
-                        name="name"
-                        required
-                        value={contactForm.name}
-                        onChange={handleInputChange}
-                        placeholder="Seu nome completo"
-                        className="mt-1 h-10 md:h-11 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="contact-phone"
-                        className="text-xs md:text-sm"
-                      >
-                        Telefone*
-                      </Label>
-                      <Input
-                        id="contact-phone"
-                        name="phone"
-                        required
-                        value={contactForm.phone}
-                        onChange={handleInputChange}
-                        placeholder="(00) 00000-0000"
-                        className="mt-1 h-10 md:h-11 text-sm"
-                      />
-                    </div>
+                  <div>
+                    <Label
+                      htmlFor="contact-name"
+                      className="text-xs md:text-sm"
+                    >
+                      Nome*
+                    </Label>
+                    <Input
+                      id="contact-name"
+                      name="name"
+                      required
+                      value={contactForm.name}
+                      onChange={handleInputChange}
+                      placeholder="Seu nome completo"
+                      className="mt-1 h-10 md:h-11 text-sm"
+                    />
                   </div>
                   <div>
                     <Label
@@ -474,7 +453,6 @@ export default function VehicleDetails() {
                     className="w-full bg-primary hover:bg-primary/90 h-10 md:h-11 text-sm md:text-base"
                     disabled={
                       !contactForm.name.trim() ||
-                      !contactForm.phone.trim() ||
                       !contactForm.message.trim()
                     }
                   >

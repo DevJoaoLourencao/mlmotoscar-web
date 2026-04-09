@@ -1,4 +1,4 @@
-import { Clock, ExternalLink, Mail, MessageCircle, Phone, Send } from "lucide-react";
+import { Clock, ExternalLink, MessageCircle, Phone, Send } from "lucide-react";
 import React, { useState } from "react";
 import { useSettings } from "../components/SettingsProvider";
 import { Button, Card, CardContent, Input, Label } from "../components/ui/core";
@@ -7,32 +7,14 @@ export default function Contact() {
   const { settings } = useSettings();
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
     message: "",
   });
-
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    if (numbers.length <= 10) {
-      return numbers
-        .replace(/(\d{2})(\d)/, "($1) $2")
-        .replace(/(\d{4})(\d)/, "$1-$2");
-    }
-    return numbers
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2")
-      .replace(/(-\d{4})\d+?$/, "$1");
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if (name === "phone") {
-      setFormData((prev) => ({ ...prev, [name]: formatPhone(value) }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -52,7 +34,7 @@ export default function Contact() {
       </div>
 
       {/* Top Row: Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
         <Card className="bg-card border-border hover:border-primary/50 transition-all hover:-translate-y-1">
           <CardContent className="p-5 md:p-6 flex flex-col items-center text-center h-full justify-center">
             <div className="p-2 md:p-3 bg-primary/10 rounded-full mb-3 md:mb-4">
@@ -118,21 +100,6 @@ export default function Contact() {
         <Card className="bg-card border-border hover:border-primary/50 transition-all hover:-translate-y-1">
           <CardContent className="p-5 md:p-6 flex flex-col items-center text-center h-full justify-center">
             <div className="p-2 md:p-3 bg-primary/10 rounded-full mb-3 md:mb-4">
-              <Mail className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-            </div>
-            <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Email</h3>
-            <a
-              href={`mailto:${settings.emailContact}`}
-              className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors block mb-1"
-            >
-              {settings.emailContact}
-            </a>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border hover:border-primary/50 transition-all hover:-translate-y-1">
-          <CardContent className="p-5 md:p-6 flex flex-col items-center text-center h-full justify-center">
-            <div className="p-2 md:p-3 bg-primary/10 rounded-full mb-3 md:mb-4">
               <Clock className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
             <h3 className="font-bold mb-2 text-foreground text-base md:text-lg">Horários</h3>
@@ -180,7 +147,7 @@ export default function Contact() {
         </Card>
 
         {/* Right: Form */}
-        <Card className="bg-card border-border h-fit">
+        <Card className="bg-card border-border h-full">
           <CardContent className="p-5 md:p-8">
             <h2 className="text-xl md:text-2xl font-bold mb-2 text-foreground">
               Envie uma mensagem
@@ -202,17 +169,6 @@ export default function Contact() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm md:text-base">Telefone / WhatsApp</Label>
-                <Input
-                  name="phone"
-                  placeholder="(00) 00000-0000"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="h-10 md:h-11 bg-background border-input text-sm md:text-base"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label className="text-sm md:text-base">Mensagem</Label>
                 <textarea
                   name="message"
@@ -229,7 +185,6 @@ export default function Contact() {
                 className="w-full font-bold text-sm md:text-base h-11 md:h-12"
                 disabled={
                   !formData.name.trim() ||
-                  !formData.phone.trim() ||
                   !formData.message.trim()
                 }
               >

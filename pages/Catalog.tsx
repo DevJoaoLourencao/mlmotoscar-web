@@ -83,11 +83,11 @@ export default function Catalog() {
   };
 
   return (
-    <div className="container mx-auto px-10 py-10 md:px-4 md:py-10 animate-fade-in-up">
+    <div className="container mx-auto px-4 py-10 animate-fade-in-up">
       <div className="mb-8 md:mb-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-3xl md:text-3xl font-bold mb-2 text-foreground">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">
               Nosso Estoque
             </h1>
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
@@ -115,28 +115,28 @@ export default function Catalog() {
           </span>
           <Badge
             variant={priceFilter === "all" ? "default" : "outline"}
-            className="cursor-pointer px-4 py-2 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="cursor-pointer px-3 py-1.5 text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => setPriceFilter("all")}
           >
             Todos
           </Badge>
           <Badge
             variant={priceFilter === "8k" ? "default" : "outline"}
-            className="cursor-pointer px-4 py-2 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="cursor-pointer px-3 py-1.5 text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => setPriceFilter("8k")}
           >
             Até 8 mil
           </Badge>
           <Badge
             variant={priceFilter === "10k" ? "default" : "outline"}
-            className="cursor-pointer px-4 py-2 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="cursor-pointer px-3 py-1.5 text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => setPriceFilter("10k")}
           >
             Até 10 mil
           </Badge>
           <Badge
             variant={priceFilter === "15k" ? "default" : "outline"}
-            className="cursor-pointer px-4 py-2 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="cursor-pointer px-3 py-1.5 text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
             onClick={() => setPriceFilter("15k")}
           >
             Até 15 mil
@@ -233,7 +233,7 @@ export default function Catalog() {
                     setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={currentPage === 1}
-                  className="h-8 md:h-9 px-2 md:px-3 text-xs md:text-sm"
+                  className="h-10 px-3 text-sm"
                 >
                   <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden md:inline">Anterior</span>
@@ -265,7 +265,7 @@ export default function Catalog() {
                             }
                             size="sm"
                             onClick={() => setCurrentPage(page)}
-                            className="min-w-[32px] md:min-w-[40px] h-8 md:h-9 text-xs md:text-sm"
+                            className="min-w-[40px] h-10 text-sm"
                           >
                             {page}
                           </Button>
@@ -280,7 +280,7 @@ export default function Catalog() {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className="h-8 md:h-9 px-2 md:px-3 text-xs md:text-sm"
+                  className="h-10 px-3 text-sm"
                 >
                   <span className="hidden md:inline">Próxima</span>
                   <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />

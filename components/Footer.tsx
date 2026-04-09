@@ -1,7 +1,6 @@
 import {
   Facebook,
   Instagram,
-  Mail,
   MapPin,
   MessageCircle,
   Phone
@@ -20,7 +19,7 @@ export default function Footer() {
   return (
     <footer className="px-4 bg-card border-t border-border pt-16 pb-8 text-sm transition-colors duration-300">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand Column */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center">
@@ -144,15 +143,6 @@ export default function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <span>WhatsApp</span>
-                </a>
-              </li>
-              <li className="flex items-start space-x-3">
-                <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <a 
-                  href={`mailto:${settings.emailContact}`}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {settings.emailContact}
                 </a>
               </li>
             </ul>

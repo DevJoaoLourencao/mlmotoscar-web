@@ -52,7 +52,7 @@ export default function Home() {
             <br />
             <span className="text-primary drop-shadow-lg">Começa Aqui.</span>
           </h1>
-          <p className="text-base md:text-xl lg:text-2xl text-gray-300 mb-5 max-w-2xl font-light leading-relaxed px-4 md:px-0">
+          <p className="text-base md:text-xl lg:text-2xl text-white/80 mb-5 max-w-2xl font-light leading-relaxed px-4 md:px-0">
             Descubra veículos que combinam com o seu ritmo. <br className="hidden md:block" /> Praticidade, segurança e preço justo com a {settings.storeName}.
           </p>
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-10 px-4 md:px-0">
@@ -86,7 +86,7 @@ export default function Home() {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full bg-transparent border-white/20 text-white hover:bg-white hover:text-black"
+                className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full bg-transparent border-white/50 text-white hover:bg-white hover:text-black"
               >
                 Fale Conosco
               </Button>
@@ -101,9 +101,9 @@ export default function Home() {
       </section>
 
       {/* Benefits */}
-      <section className="pt-0 pb-12 md:pt-24 md:pb-24 bg-background border-b border-border">
+      <section className="py-12 md:py-24 bg-background border-b border-border">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
-          <div className="flex flex-col items-center text-center p-4 md:p-8 transition-transform hover:-translate-y-2 duration-300">
+          <div className="flex flex-col items-center text-center p-4 md:p-8 transition-transform hover:-translate-y-2 duration-300 border-b md:border-b-0 border-border pb-8 md:pb-8">
             <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
               <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
@@ -115,7 +115,7 @@ export default function Home() {
               venda.
             </p>
           </div>
-          <div className="flex flex-col items-center text-center p-4 md:p-8 transition-transform hover:-translate-y-2 duration-300">
+          <div className="flex flex-col items-center text-center p-4 md:p-8 transition-transform hover:-translate-y-2 duration-300 border-b md:border-b-0 border-border pb-8 md:pb-8">
             <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
               <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
@@ -142,7 +142,7 @@ export default function Home() {
 
       {/* Featured Section */}
       {!loading && featured.length > 0 && (
-        <section className="pt-12 md:pt-24 container mx-auto px-10 border-b border-border">
+        <section className="pt-12 md:pt-24 container mx-auto px-4 border-b border-border">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-16 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">

@@ -8,7 +8,7 @@ export default function FloatingChat() {
   return (
     <button
       onClick={handleClick}
-      className="fixed bottom-6 right-6 z-50 p-4 text-white rounded-full shadow-2xl shadow-green-900/40 hover:scale-110 transition-all duration-300 animate-fade-in-up group flex items-center justify-center hover:opacity-90"
+      className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 p-4 text-white rounded-full shadow-2xl shadow-green-900/40 hover:scale-110 transition-all duration-300 animate-fade-in-up group flex items-center justify-center hover:opacity-90"
       style={{ backgroundColor: 'var(--whatsapp)' }}
       aria-label="Fale conosco no WhatsApp"
     >

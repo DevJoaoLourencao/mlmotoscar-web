@@ -24,7 +24,7 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
           <img
             src={vehicle.images?.[0] || (vehicle as any).image_url}
             alt={`${vehicle.title} - ${vehicle.year}`}
-            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
           />
         </div>
         <CardContent className="p-4 md:p-5 flex flex-col gap-2 md:gap-3 flex-1">
@@ -38,7 +38,7 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
           </div>
           
           <div className="mt-auto">
-            <div className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4">
+            <div className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4">
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
