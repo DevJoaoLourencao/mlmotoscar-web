@@ -13,10 +13,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../components/SettingsProvider";
-import { usePageTitle } from "../hooks/usePageTitle";
 import VehicleCard from "../components/VehicleCard";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/core";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { getReviews } from "../services/reviewsService";
 import { getVehicles } from "../services/vehicleService";
 import { Review, Vehicle } from "../types";
@@ -82,9 +82,7 @@ export default function Home() {
             <span className="text-primary drop-shadow-lg">Começa Aqui.</span>
           </h1>
           <p className="text-base md:text-xl lg:text-2xl text-white/80 mb-5 max-w-2xl font-light leading-relaxed px-4 md:px-0">
-            Descubra veículos que combinam com o seu ritmo.{" "}
-            <br className="hidden md:block" /> Praticidade, segurança e preço
-            justo com a {settings.storeName}.
+            Praticidade, segurança e preço justo.
           </p>
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-10 px-4 md:px-0">
             <Badge
