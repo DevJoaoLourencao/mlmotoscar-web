@@ -18,12 +18,14 @@ No test framework configured. There is a Supabase connection test: `npm run test
 
 ## Tech Stack
 
-- **React 19** + **TypeScript** + **Vite** (not Next.js — ignore the `.cursorrules` references to Next.js)
+- **React 19** + **TypeScript** + **Vite**
 - **React Router v7** with `HashRouter` (all routes use `#` prefix)
 - **Supabase** for database + auth + storage
-- **Tailwind CSS** + shadcn/ui component patterns (components built manually in `components/ui/`)
+- **Tailwind CSS** via CDN (`index.html`). `tailwind.config.js` exists only for IDE IntelliSense — it mirrors the inline config in `index.html`. Keep both in sync when extending the theme.
+- shadcn/ui component patterns (components built manually in `components/ui/`)
 - **Yup** for form validation schemas (`validations/`)
 - **jsPDF** for contract/PDF generation
+- **Deployed on Vercel** — `vercel.json` configures security headers and SPA rewrite rules
 
 ## Architecture
 
@@ -33,7 +35,9 @@ Two layouts:
 - `PublicLayout` — wraps public pages with `Navbar`, `Footer`, `FloatingChat`
 - `AdminLayout` (pages/admin/AdminLayout.tsx) — protected sidebar layout for admin pages
 
-Admin is protected by Supabase auth (`services/authService.ts`). Login at `/admin/login`.
+Admin is protected by Supabase auth (`services/authService.ts`). Login at `/admin/login`. `AdminLayout` shows a loading spinner while the auth check is in progress to prevent content flash for unauthenticated users.
+
+A catch-all `<Route path="*">` inside `PublicLayout` renders `pages/NotFound.tsx`.
 
 ### State Management
 
@@ -54,9 +58,14 @@ All Supabase queries are isolated here. Services return typed data from `types.t
 - `authService.ts` — Supabase auth (sign in/out, session check)
 - `reviewsService.ts` — Google-style reviews for the public home page
 
+### Hooks (`hooks/`)
+
+- `usePageTitle(title?)` — sets `document.title` to `"<title> | ML MOTOSCAR"`. Call at the top of every public page.
+- `useFavicon(url?)` — dynamically swaps the favicon from a URL stored in settings.
+
 ### Database
 
-Full schema is in `supabase-schema.sql`. Migrations are in `migration-*.sql` files at project root. **Always run migrations in Supabase after schema changes.**
+Full schema is in `supabase-schema.sql`. This is the single source of truth — there are no `migration-*.sql` files. When changing the schema, write and apply the SQL directly in the Supabase dashboard, then update `supabase-schema.sql`.
 
 Key tables: `vehicles`, `brands`, `models`, `customers`, `sales`, `payment_history`, `settings`, (reviews).
 
@@ -75,6 +84,7 @@ Vehicle images are stored as `string[]` (Supabase Storage URLs) in the `images` 
 - `components/ui/` — shadcn-style primitives (Button, Card, Input, etc.)
 - `components/ui/core.tsx` — barrel export for common UI primitives
 - Custom components: `ImageUpload`, `SingleImageUpload`, `AdminPageComponents`, `FloatingChat`, `Navbar`, `Footer`
+- `FloatingChat` uses `useSettings()` for the WhatsApp phone number — do not hardcode it
 
 ### Dynamic Theming
 
@@ -87,6 +97,13 @@ Required in `.env`:
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
+
+## SEO & Security
+
+- `public/robots.txt` blocks `/admin` from indexing; `public/sitemap.xml` lists public routes.
+- `vercel.json` sets security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, etc.) for production.
+- `index.html` contains Open Graph tags, Twitter Card, and a JSON-LD `AutoDealer` schema for the business.
+- The production domain is `mlmotoscarmarilia.com.br` — update it in `index.html`, `robots.txt`, and `sitemap.xml` if it changes.
 
 ## Language Convention
 
