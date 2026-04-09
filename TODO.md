@@ -1,2 +1,2 @@
-- alterar modais do sistema. atual nao atende.
-- remover telefone do modal de contato ß
+- refatorar tela 404 quando nao encontrar
+- refatorar pdf de contrato de venda

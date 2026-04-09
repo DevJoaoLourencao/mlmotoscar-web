@@ -24,6 +24,16 @@ const DEFAULT_SETTINGS: AppSettings = {
   socialInstagram: "https://instagram.com",
   socialFacebook: "https://facebook.com",
   googleMapsUrl: "",
+  googleReviewsUrl: "",
+  googleWriteReviewUrl: "",
+  sellerName: "",
+  sellerRg: "",
+  sellerCpf: "",
+  sellerAddress: "",
+  sellerCity: "",
+  sellerState: "",
+  sellerCep: "",
+  sellerPhone: "",
   defaultTheme: "dark",
 };
 

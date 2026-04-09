@@ -1,11 +1,18 @@
 import {
   Clock,
+  Eye,
+  EyeOff,
   Globe,
   Image,
   Palette,
+  Pencil,
+  Plus,
   Save,
   Smartphone,
+  Star,
   Store,
+  Trash2,
+  UserCheck,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,7 +32,29 @@ import {
   Skeleton,
 } from "../../components/ui/core";
 import { getSettings, saveSettings } from "../../services/settingsService";
-import { AppSettings } from "../../types";
+import {
+  createReview,
+  deleteReview,
+  getReviews,
+  updateReview,
+} from "../../services/reviewsService";
+import { AppSettings, Review } from "../../types";
+
+const EMPTY_REVIEW = { name: "", rating: 5, text: "", active: true };
+
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          className={`h-5 w-5 cursor-pointer ${s <= value ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`}
+          onClick={() => onChange(s)}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { settings, updateSettings } = useSettings();
@@ -33,6 +62,40 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewForm, setReviewForm] = useState(EMPTY_REVIEW);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [savingReview, setSavingReview] = useState(false);
+
+  const loadReviews = async () => { setReviews(await getReviews()); };
+
+  const openNewReview = () => { setEditingReviewId(null); setReviewForm(EMPTY_REVIEW); setShowReviewForm(true); };
+  const openEditReview = (r: Review) => { setEditingReviewId(r.id); setReviewForm({ name: r.name, rating: r.rating, text: r.text, active: r.active }); setShowReviewForm(true); };
+
+  const handleSaveReview = async () => {
+    if (!reviewForm.name.trim() || !reviewForm.text.trim()) return;
+    setSavingReview(true);
+    try {
+      if (editingReviewId) await updateReview(editingReviewId, reviewForm);
+      else await createReview(reviewForm);
+      setShowReviewForm(false);
+      await loadReviews();
+    } finally { setSavingReview(false); }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm("Excluir este depoimento?")) return;
+    await deleteReview(id);
+    await loadReviews();
+  };
+
+  const handleToggleReview = async (r: Review) => {
+    await updateReview(r.id, { active: !r.active });
+    await loadReviews();
+  };
 
   // Buscar configurações do Supabase ao carregar
   useEffect(() => {
@@ -49,6 +112,7 @@ export default function SettingsPage() {
     };
 
     loadSettings();
+    loadReviews();
   }, []);
 
   const handleInputChange = (
@@ -495,6 +559,161 @@ export default function SettingsPage() {
                 placeholder="https://..."
               />
             </div>
+            <div className="space-y-2">
+              <Label>Google Reviews URL</Label>
+              <Input
+                name="googleReviewsUrl"
+                value={formData.googleReviewsUrl || ""}
+                onChange={handleInputChange}
+                className="bg-background text-foreground"
+                placeholder="https://g.page/r/..."
+              />
+              <p className="text-xs text-muted-foreground">Link para a página de avaliações da loja no Google. Exibido no botão "Ver todas as avaliações".</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Google Escrever Avaliação URL</Label>
+              <Input
+                name="googleWriteReviewUrl"
+                value={formData.googleWriteReviewUrl || ""}
+                onChange={handleInputChange}
+                className="bg-background text-foreground"
+                placeholder="https://g.page/r/.../review"
+              />
+              <p className="text-xs text-muted-foreground">Link direto para escrever uma avaliação no Google. Exibido no botão "Avaliar no Google".</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Seller Info */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <UserCheck className="h-5 w-5 text-primary" /> Dados do Vendedor (para Contratos)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-xs text-muted-foreground">Esses dados são usados para pré-preencher a seção de Vendedor ao gerar contratos.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Nome Completo</Label>
+                <Input name="sellerName" value={formData.sellerName || ""} onChange={handleInputChange} placeholder="Nome completo do vendedor" className="bg-background text-foreground" />
+              </div>
+              <div className="space-y-2">
+                <Label>RG</Label>
+                <Input name="sellerRg" value={formData.sellerRg || ""} onChange={handleInputChange} placeholder="Ex: 6.181.046 SSP/SC" className="bg-background text-foreground" />
+              </div>
+              <div className="space-y-2">
+                <Label>CPF</Label>
+                <Input name="sellerCpf" value={formData.sellerCpf || ""} onChange={handleInputChange} placeholder="000.000.000-00" className="bg-background text-foreground" />
+              </div>
+              <div className="space-y-2">
+                <Label>Telefone</Label>
+                <Input name="sellerPhone" value={formData.sellerPhone || ""} onChange={handleInputChange} placeholder="(00) 00000-0000" className="bg-background text-foreground" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Endereço (Rua, número, bairro)</Label>
+              <Input name="sellerAddress" value={formData.sellerAddress || ""} onChange={handleInputChange} placeholder="Rua Felipe Camarão, 113, Lorenzetti" className="bg-background text-foreground" />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>CEP</Label>
+                <Input name="sellerCep" value={formData.sellerCep || ""} onChange={handleInputChange} placeholder="00000-000" className="bg-background text-foreground" />
+              </div>
+              <div className="space-y-2">
+                <Label>Cidade</Label>
+                <Input name="sellerCity" value={formData.sellerCity || ""} onChange={handleInputChange} placeholder="Marília" className="bg-background text-foreground" />
+              </div>
+              <div className="space-y-2">
+                <Label>Estado (UF)</Label>
+                <Input name="sellerState" value={formData.sellerState || ""} onChange={handleInputChange} placeholder="SP" maxLength={2} className="bg-background text-foreground uppercase" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Reviews */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Star className="h-5 w-5 text-primary" /> Depoimentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">Gerencie os depoimentos exibidos na página inicial.</p>
+              <Button size="sm" onClick={openNewReview} className="gap-2 shrink-0">
+                <Plus className="h-4 w-4" /> Novo
+              </Button>
+            </div>
+
+            {showReviewForm && (
+              <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
+                <h4 className="font-semibold text-sm text-foreground">{editingReviewId ? "Editar" : "Novo"} Depoimento</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Nome do cliente</Label>
+                    <Input value={reviewForm.name} onChange={(e) => setReviewForm((p) => ({ ...p, name: e.target.value }))} placeholder="Ex: Maria Silva" className="bg-background h-9" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Avaliação</Label>
+                    <StarPicker value={reviewForm.rating} onChange={(v) => setReviewForm((p) => ({ ...p, rating: v }))} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Depoimento</Label>
+                  <textarea
+                    value={reviewForm.text}
+                    onChange={(e) => setReviewForm((p) => ({ ...p, text: e.target.value }))}
+                    placeholder="Escreva o depoimento..."
+                    rows={3}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" id="rev-active" checked={reviewForm.active} onChange={(e) => setReviewForm((p) => ({ ...p, active: e.target.checked }))} className="h-4 w-4 accent-primary" />
+                  <Label htmlFor="rev-active" className="text-xs cursor-pointer">Exibir no site</Label>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveReview} disabled={savingReview || !reviewForm.name.trim() || !reviewForm.text.trim()}>
+                    {savingReview ? "Salvando..." : "Salvar"}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setShowReviewForm(false)}>Cancelar</Button>
+                </div>
+              </div>
+            )}
+
+            {reviews.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">Nenhum depoimento cadastrado.</p>
+            ) : (
+              <div className="space-y-2">
+                {reviews.map((r) => (
+                  <div key={r.id} className={`flex items-start gap-3 p-3 rounded-lg border border-border ${!r.active ? "opacity-50" : ""}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-sm text-foreground">{r.name}</span>
+                        <div className="flex gap-0.5">
+                          {[1,2,3,4,5].map((s) => <Star key={s} className={`h-3 w-3 ${s <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />)}
+                        </div>
+                        {!r.active && <span className="text-xs text-muted-foreground border border-border rounded px-1.5">Oculto</span>}
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{r.text}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleToggleReview(r)} title={r.active ? "Ocultar" : "Exibir"}>
+                        {r.active ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEditReview(r)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDeleteReview(r.id)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

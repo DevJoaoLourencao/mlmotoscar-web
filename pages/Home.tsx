@@ -1,24 +1,50 @@
+import Autoplay from "embla-carousel-autoplay";
+import useEmblaCarousel from "embla-carousel-react";
 import {
   ArrowRight,
   CheckCircle,
   Clock,
   DollarSign,
+  ExternalLink,
   MapPin,
   ShieldCheck,
+  Star,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../components/SettingsProvider";
 import VehicleCard from "../components/VehicleCard";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/core";
+import { getReviews } from "../services/reviewsService";
 import { getVehicles } from "../services/vehicleService";
-import { Vehicle } from "../types";
+import { Review, Vehicle } from "../types";
+
+function StarDisplay({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          className={`h-4 w-4 ${s <= rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function Home() {
   const { settings } = useSettings();
   const [featured, setFeatured] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+  const autoplayRef = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false }),
+  );
+  const [emblaRef] = useEmblaCarousel({ loop: true, align: "start" }, [
+    autoplayRef.current,
+  ]);
 
   useEffect(() => {
     getVehicles().then((data) => {
@@ -26,12 +52,13 @@ export default function Home() {
       setFeatured(availableVehicles.slice(0, 3));
       setLoading(false);
     });
+    getReviews(true).then(setReviews);
   }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section - Keeps dark overlay style regardless of theme */}
-      <section className="relative h-[700px] flex items-center overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative mt-[-80px] h-[800px] flex items-center overflow-hidden">
         <video
           autoPlay
           loop
@@ -53,7 +80,9 @@ export default function Home() {
             <span className="text-primary drop-shadow-lg">Começa Aqui.</span>
           </h1>
           <p className="text-base md:text-xl lg:text-2xl text-white/80 mb-5 max-w-2xl font-light leading-relaxed px-4 md:px-0">
-            Descubra veículos que combinam com o seu ritmo. <br className="hidden md:block" /> Praticidade, segurança e preço justo com a {settings.storeName}.
+            Descubra veículos que combinam com o seu ritmo.{" "}
+            <br className="hidden md:block" /> Praticidade, segurança e preço
+            justo com a {settings.storeName}.
           </p>
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-10 px-4 md:px-0">
             <Badge
@@ -82,7 +111,7 @@ export default function Home() {
             </Badge>
           </div>
           <div className="px-4 md:px-0 flex flex-col md:flex-row gap-4 md:gap-6 justify-center md:justify-start">
-          <Link to="/contato" className="w-full md:w-auto">
+            <Link to="/contato" className="w-full md:w-auto">
               <Button
                 variant="outline"
                 size="lg"
@@ -92,10 +121,13 @@ export default function Home() {
               </Button>
             </Link>
             <Link to="/catalogo" className="w-full md:w-auto">
-              <Button size="lg" className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full">
+              <Button
+                size="lg"
+                className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full"
+              >
                 Ver Estoque <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>            
+            </Link>
           </div>
         </div>
       </section>
@@ -165,10 +197,13 @@ export default function Home() {
               <VehicleCard key={vehicle.id} vehicle={vehicle} index={index} />
             ))}
           </div>
-          
+
           <div className="md:hidden flex justify-center mb-12">
             <Link to="/catalogo" className="w-full max-w-md">
-              <Button size="lg" className="w-full text-base px-8 py-6 rounded-full shadow-lg">
+              <Button
+                size="lg"
+                className="w-full text-base px-8 py-6 rounded-full shadow-lg"
+              >
                 Ver Estoque Completo <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -176,10 +211,84 @@ export default function Home() {
         </section>
       )}
 
+      {/* Reviews Carousel */}
+      {reviews.length > 0 && (
+        <section className="py-12 md:py-24 bg-muted/30 border-b border-border overflow-hidden">
+          <div className="container mx-auto px-4 text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  className="h-5 w-5 fill-yellow-400 text-yellow-400"
+                />
+              ))}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              O que nossos clientes dizem
+            </h2>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Experiências reais de quem já comprou conosco.
+            </p>
+          </div>
+
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-4 md:gap-6 px-4 md:px-8">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="flex-none w-[85vw] sm:w-[360px] md:w-[380px] bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col gap-3"
+                >
+                  <StarDisplay rating={review.rating} />
+                  <p className="text-sm md:text-base text-foreground/80 leading-relaxed flex-1">
+                    "{review.text}"
+                  </p>
+                  <div className="flex items-center gap-3 pt-2 border-t border-border">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
+                      {review.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-semibold text-sm text-foreground">
+                      {review.name}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {(settings.googleReviewsUrl || settings.googleWriteReviewUrl) && (
+            <div className="flex flex-wrap justify-center gap-3 mt-8 md:mt-10">
+              {settings.googleWriteReviewUrl && (
+                <a
+                  href={settings.googleWriteReviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button className="gap-2 rounded-full px-6">
+                    <Star className="h-4 w-4" />
+                    Avaliar no Google
+                  </Button>
+                </a>
+              )}
+              {settings.googleReviewsUrl && (
+                <a
+                  href={settings.googleReviewsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="gap-2 rounded-full px-6">
+                    <ExternalLink className="h-4 w-4" />
+                    Ver todas as avaliações no Google
+                  </Button>
+                </a>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Contact Quick Access */}
       <section className="py-12 md:py-24 container mx-auto px-4">
         <div className="relative rounded-2xl md:rounded-3xl overflow-hidden p-6 md:p-16 text-center border border-border bg-card shadow-xl">
-          {/* Decorative Background Glow - Adjusted for theme */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
 
           <div className="relative z-10 max-w-4xl mx-auto">
@@ -187,8 +296,8 @@ export default function Home() {
               Estamos esperando por você
             </h2>
             <p className="text-muted-foreground text-sm md:text-lg mb-8 md:mb-12 max-w-2xl mx-auto">
-              Venha nos visitar ou entre em contato. Nossa equipe está pronta para 
-              ajudar a encontrar o veículo ideal para você.
+              Venha nos visitar ou entre em contato. Nossa equipe está pronta
+              para ajudar a encontrar o veículo ideal para você.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch">
@@ -199,9 +308,9 @@ export default function Home() {
                 className="block group h-full"
               >
                 <div className="h-full p-5 md:p-6 rounded-xl md:rounded-2xl bg-secondary/50 border border-border hover:border-primary/50 transition-all hover:bg-secondary flex flex-col items-center justify-center text-center">
-                  <img 
-                    src="/zap-logo.png" 
-                    alt="WhatsApp" 
+                  <img
+                    src="/zap-logo.png"
+                    alt="WhatsApp"
                     className="h-8 w-8 md:h-10 md:w-10 mx-auto mb-3 md:mb-4 group-hover:scale-110 transition-transform object-contain"
                   />
                   <h3 className="font-bold text-base md:text-lg mb-1 text-foreground">

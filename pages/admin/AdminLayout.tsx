@@ -17,7 +17,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSettings } from "../../components/SettingsProvider";
 import { useTheme } from "../../components/ThemeProvider";
@@ -86,101 +86,143 @@ export default function AdminLayout() {
       <Link to="/admin" className={isSidebarCollapsed ? "block mb-3" : "block"}>
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin"
+            "/admin",
           )}`}
           title={isSidebarCollapsed ? "Dashboard" : ""}
         >
           <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Dashboard</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Dashboard</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/estoque" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/estoque"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
             "/admin/estoque",
-            true
+            true,
           )}`}
           title={isSidebarCollapsed ? "Estoque" : ""}
         >
           <Car className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Estoque</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Estoque</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/anuncios" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/anuncios"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/anuncios"
+            "/admin/anuncios",
           )}`}
           title={isSidebarCollapsed ? "Anúncios" : ""}
         >
           <Megaphone className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Anúncios</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Anúncios</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/clientes" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/clientes"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/clientes"
+            "/admin/clientes",
           )}`}
           title={isSidebarCollapsed ? "Clientes" : ""}
         >
           <Users className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Clientes</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Clientes</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/financiamento" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/financiamento"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/financiamento"
+            "/admin/financiamento",
           )}`}
           title={isSidebarCollapsed ? "Simulador" : ""}
         >
           <Calculator className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Simulador</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Simulador</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/vendas" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/vendas"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/vendas"
+            "/admin/vendas",
           )}`}
           title={isSidebarCollapsed ? "Vendas" : ""}
         >
           <DollarSign className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Vendas</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Vendas</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/contratos" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/contratos"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/contratos"
+            "/admin/contratos",
           )}`}
           title={isSidebarCollapsed ? "Contratos" : ""}
         >
           <FileCheck className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Contratos</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Contratos</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/pagamentos" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/pagamentos"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/pagamentos"
+            "/admin/pagamentos",
           )}`}
           title={isSidebarCollapsed ? "Pagamentos" : ""}
         >
           <Wallet className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Pagamentos</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Pagamentos</span>
+          )}
         </div>
       </Link>
-      <Link to="/admin/configuracoes" className={isSidebarCollapsed ? "block mb-3" : "block"}>
+      <Link
+        to="/admin/configuracoes"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/configuracoes"
+            "/admin/configuracoes",
           )}`}
           title={isSidebarCollapsed ? "Configurações" : ""}
         >
           <Settings className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Configurações</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Configurações</span>
+          )}
         </div>
       </Link>
     </>
@@ -193,14 +235,24 @@ export default function AdminLayout() {
         variant="ghost"
         className={`w-full ${isSidebarCollapsed ? "justify-center" : "justify-start"} gap-3 text-muted-foreground hover:text-foreground`}
         onClick={toggleTheme}
-        title={isSidebarCollapsed ? (theme === "dark" ? "Modo Claro" : "Modo Escuro") : ""}
+        title={
+          isSidebarCollapsed
+            ? theme === "dark"
+              ? "Modo Claro"
+              : "Modo Escuro"
+            : ""
+        }
       >
         {theme === "dark" ? (
           <Sun className="h-4 w-4 flex-shrink-0" />
         ) : (
           <Moon className="h-4 w-4 flex-shrink-0" />
         )}
-        {!isSidebarCollapsed && <span className="text-sm md:text-base">{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>}
+        {!isSidebarCollapsed && (
+          <span className="text-sm md:text-base">
+            {theme === "dark" ? "Modo Claro" : "Modo Escuro"}
+          </span>
+        )}
       </Button>
 
       {/* Back to Site */}
@@ -211,7 +263,9 @@ export default function AdminLayout() {
           title={isSidebarCollapsed ? "Voltar ao Site" : ""}
         >
           <ArrowLeft className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="text-sm md:text-base">Voltar ao Site</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Voltar ao Site</span>
+          )}
         </Button>
       </Link>
 
@@ -223,7 +277,9 @@ export default function AdminLayout() {
         title={isSidebarCollapsed ? "Sair" : ""}
       >
         <LogOut className="h-4 w-4 flex-shrink-0" />
-        {!isSidebarCollapsed && <span className="text-sm md:text-base">Sair</span>}
+        {!isSidebarCollapsed && (
+          <span className="text-sm md:text-base">Sair</span>
+        )}
       </Button>
     </div>
   );
@@ -275,7 +331,9 @@ export default function AdminLayout() {
         className={`${isSidebarCollapsed ? "w-16" : "w-64"} border-r border-border bg-card hidden md:flex flex-col fixed h-full z-10 shadow-sm transition-all duration-300`}
         style={sidebarStyle}
       >
-        <div className={`h-16 flex items-center ${isSidebarCollapsed ? "justify-center px-2" : "px-6"} border-b border-border relative`}>
+        <div
+          className={`h-16 flex items-center ${isSidebarCollapsed ? "justify-center px-2" : "px-6"} border-b border-border relative`}
+        >
           {!isSidebarCollapsed && (
             <span className="font-bold text-sm md:text-lg text-foreground">
               ML<span className="text-primary">ADMIN</span>
@@ -286,7 +344,11 @@ export default function AdminLayout() {
             size="icon"
             className={`${isSidebarCollapsed ? "mx-auto" : "absolute right-2"} h-8 w-8`}
             onClick={toggleSidebar}
-            title={isSidebarCollapsed ? "Expandir barra lateral" : "Minimizar barra lateral"}
+            title={
+              isSidebarCollapsed
+                ? "Expandir barra lateral"
+                : "Minimizar barra lateral"
+            }
           >
             {isSidebarCollapsed ? (
               <ChevronRight className="h-4 w-4" />
@@ -306,7 +368,9 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 ${isSidebarCollapsed ? "md:ml-16" : "md:ml-64"} bg-background min-h-screen pt-16 md:pt-0 transition-all duration-300`}>
+      <main
+        className={`flex-1 ${isSidebarCollapsed ? "md:ml-16" : "md:ml-64"} bg-background min-h-screen pt-16 md:pt-0 transition-all duration-300`}
+      >
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
           <Outlet />
         </div>

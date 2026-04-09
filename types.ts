@@ -58,6 +58,16 @@ export interface AppSettings {
   openingHoursWeekdays: string; // New: Horário de semana
   openingHoursWeekend: string; // New: Horário de fim de semana
   googleMapsUrl?: string;
+  googleReviewsUrl?: string;
+  googleWriteReviewUrl?: string;
+  sellerName?: string;
+  sellerRg?: string;
+  sellerCpf?: string;
+  sellerAddress?: string;
+  sellerCity?: string;
+  sellerState?: string;
+  sellerCep?: string;
+  sellerPhone?: string;
   socialInstagram?: string;
   socialFacebook?: string;
   defaultTheme: "dark" | "light";
@@ -114,6 +124,15 @@ export interface Sale {
   payment_history?: PaymentHistory[]; // Track payments for promissory
   status: "pending" | "completed" | "canceled";
   notes?: string;
+}
+
+export interface Review {
+  id: string;
+  name: string;
+  rating: number; // 1-5
+  text: string;
+  active: boolean;
+  created_at: string;
 }
 
 export interface AuthState {
