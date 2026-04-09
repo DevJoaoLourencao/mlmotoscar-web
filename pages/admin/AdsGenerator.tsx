@@ -1,4 +1,10 @@
-import { CheckCircle, Copy, Download, ImageDown, MessageCircle } from "lucide-react";
+import {
+  CheckCircle,
+  Copy,
+  Download,
+  ImageDown,
+  MessageCircle,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   AdminPageContainer,
@@ -89,7 +95,11 @@ Financiamos em até 48x com entrada mínima de 10% do valor do veículo. Parcela
     window.open(url, "_blank");
   };
 
-  const downloadImage = async (url: string, index: number, vehicleTitle: string) => {
+  const downloadImage = async (
+    url: string,
+    index: number,
+    vehicleTitle: string,
+  ) => {
     try {
       const response = await fetch(url);
       const blob = await response.blob();
@@ -181,55 +191,60 @@ Financiamos em até 48x com entrada mínima de 10% do valor do veículo. Parcela
         </Card>
 
         {/* Step 2: Images */}
-        {selectedVehicleId && (() => {
-          const v = vehicles.find((x) => x.id === selectedVehicleId);
-          if (!v || !v.images?.length) return null;
-          return (
-            <Card className="bg-card border-border shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-foreground">
-                  2. Fotos do Veículo
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({v.images.length} {v.images.length === 1 ? "foto" : "fotos"})
-                  </span>
-                </CardTitle>
-                <Button
-                  size="sm"
-                  className="gap-2 shrink-0"
-                  onClick={() => downloadAllImages(v.images, v.title)}
-                >
-                  <ImageDown className="h-4 w-4" /> Baixar Todas
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {v.images.map((url, idx) => (
-                    <div key={idx} className="relative group rounded-lg overflow-hidden border border-border bg-muted aspect-square">
-                      <img
-                        src={url}
-                        alt={`Foto ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="gap-1.5 text-xs font-medium"
-                          onClick={() => downloadImage(url, idx, v.title)}
-                        >
-                          <Download className="h-3.5 w-3.5" /> Baixar
-                        </Button>
+        {selectedVehicleId &&
+          (() => {
+            const v = vehicles.find((x) => x.id === selectedVehicleId);
+            if (!v || !v.images?.length) return null;
+            return (
+              <Card className="bg-card border-border shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="text-foreground">
+                    2. Fotos do Veículo
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      ({v.images.length}{" "}
+                      {v.images.length === 1 ? "foto" : "fotos"})
+                    </span>
+                  </CardTitle>
+                  <Button
+                    size="sm"
+                    className="gap-2 shrink-0"
+                    onClick={() => downloadAllImages(v.images, v.title)}
+                  >
+                    <ImageDown className="h-4 w-4" /> Baixar Todas
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    {v.images.map((url, idx) => (
+                      <div
+                        key={idx}
+                        className="relative group rounded-lg overflow-hidden border border-border bg-muted aspect-square"
+                      >
+                        <img
+                          src={url}
+                          alt={`Foto ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="gap-1.5 text-xs font-medium"
+                            onClick={() => downloadImage(url, idx, v.title)}
+                          >
+                            <Download className="h-3.5 w-3.5" /> Baixar
+                          </Button>
+                        </div>
+                        <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                          {idx + 1}
+                        </span>
                       </div>
-                      <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
-                        {idx + 1}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })()}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
 
         {/* Step 3: Copy Editor */}
         <Card className="bg-card border-border shadow-sm">
@@ -240,6 +255,7 @@ Financiamos em até 48x com entrada mínima de 10% do valor do veículo. Parcela
             <textarea
               className="flex min-h-[300px] w-full rounded-md border border-input bg-background px-4 py-4 text-sm font-mono leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-foreground shadow-sm resize-y"
               value={adText}
+              readOnly
               onChange={(e) => setAdText(e.target.value)}
               placeholder="Selecione um veículo acima para gerar o texto automático..."
             />

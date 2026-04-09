@@ -82,14 +82,14 @@ export default function VehicleDetails() {
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = `Olá, vi o ${vehicle.title} no site ${settings.storeName}.\n\n${contactForm.message}\n\n*Meus dados:*\n👤 Nome: ${contactForm.name}`;
+    const message = `Olá, vi o anúncio ${vehicle.title} no site da ${settings.storeName}.\n\n *Nome*: ${contactForm.name}.\n\n *Mensagem*: ${contactForm.message}\n\n`;
     const url = `https://wa.me/5514991569560?text=${encodeURIComponent(
       message,
     )}`;
     window.open(url, "_blank");
     setContactForm({
       name: "",
-      message: "Olá, tenho interesse no veículo. Por favor entre em contato.",
+      message: "Tenho interesse no veículo. Por favor entre em contato.",
     });
   };
 
@@ -319,7 +319,7 @@ export default function VehicleDetails() {
                     Ano
                   </p>
                   <p className="text-sm md:text-base font-medium text-white">
-                    {vehicle.year}/{vehicle.year}
+                    {vehicle.year}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -452,8 +452,7 @@ export default function VehicleDetails() {
                     type="submit"
                     className="w-full bg-primary hover:bg-primary/90 h-10 md:h-11 text-sm md:text-base"
                     disabled={
-                      !contactForm.name.trim() ||
-                      !contactForm.message.trim()
+                      !contactForm.name.trim() || !contactForm.message.trim()
                     }
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
