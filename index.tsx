@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import { ThemeProvider } from './components/ThemeProvider';
 import { SettingsProvider } from './components/SettingsProvider';
@@ -12,10 +13,12 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <SettingsProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="mlmotoscar-theme">
-        <App />
-      </ThemeProvider>
-    </SettingsProvider>
+    <HelmetProvider>
+      <SettingsProvider>
+        <ThemeProvider defaultTheme="dark" storageKey="mlmotoscar-theme">
+          <App />
+        </ThemeProvider>
+      </SettingsProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );

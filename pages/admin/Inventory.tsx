@@ -2,7 +2,6 @@ import {
   AlertTriangle,
   Car,
   CheckCircle,
-  Clock,
   Copy,
   CreditCard,
   Edit,
@@ -18,12 +17,14 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AdminPageContainer,
   AdminPageHeader,
 } from "../../components/AdminPageComponents";
+import PaymentMethodBadge from "../../components/PaymentMethodBadge";
+import { VehicleLightbox } from "../../components/VehicleGallery/VehicleLightbox";
 import {
   Badge,
   Button,
@@ -46,17 +47,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-import PaymentMethodBadge from "../../components/PaymentMethodBadge";
-import { COLOR_OPTIONS } from "../../constants/colors";
-import { formatCurrencyBRL } from "../../utils/formatters";
-import { cn } from "../../lib/utils";
 import { getSaleByVehicleId } from "../../services/salesService";
 import {
   deleteVehicle,
@@ -64,6 +54,7 @@ import {
   updateVehicle,
 } from "../../services/vehicleService";
 import { PaymentDetails, Sale, Vehicle } from "../../types";
+import { formatCurrencyBRL } from "../../utils/formatters";
 
 export default function Inventory() {
   const navigate = useNavigate();
@@ -76,9 +67,6 @@ export default function Inventory() {
     "all",
   );
   const [typeFilter, setTypeFilter] = useState<"all" | "carro" | "moto">("all");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "available" | "sold"
-  >("available");
 
   // Delete Modal State
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
@@ -93,6 +81,10 @@ export default function Inventory() {
     useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
+  // Lightbox State
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   const loadData = () => {
     setLoading(true);
     getVehicles().then((data) => {
@@ -104,7 +96,6 @@ export default function Inventory() {
   useEffect(() => {
     loadData();
   }, []);
-
 
   // Gerar título automaticamente
   const generateTitle = (
@@ -267,7 +258,6 @@ export default function Inventory() {
     }
   };
 
-
   // Filter Logic
   const filteredVehicles = vehicles.filter((v) => {
     const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase());
@@ -280,9 +270,7 @@ export default function Inventory() {
     let matchesType = true;
     if (typeFilter !== "all") matchesType = v.type === typeFilter;
 
-    let matchesStatus = true;
-    const vStatus = v.status || "available";
-    if (statusFilter !== "all") matchesStatus = vStatus === statusFilter;
+    const matchesStatus = (v.status || "available") === "available";
 
     return matchesSearch && matchesPrice && matchesType && matchesStatus;
   });
@@ -290,15 +278,20 @@ export default function Inventory() {
   const getDaysInStock = (vehicle: Vehicle): number => {
     const created = new Date(vehicle.created_at);
     const now = new Date();
-    return Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.floor(
+      (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24),
+    );
   };
 
   const getInventoryStats = () => {
-    const available = vehicles.filter((v) => (v.status || "available") === "available");
+    const available = vehicles.filter(
+      (v) => (v.status || "available") === "available",
+    );
     const totalValue = available.reduce((sum, v) => sum + v.price, 0);
-    const maxDays = available.length > 0
-      ? Math.max(...available.map((v) => getDaysInStock(v)))
-      : 0;
+    const maxDays =
+      available.length > 0
+        ? Math.max(...available.map((v) => getDaysInStock(v)))
+        : 0;
     return { availableCount: available.length, totalValue, maxDays };
   };
 
@@ -357,7 +350,7 @@ export default function Inventory() {
       />
 
       {/* KPIs de Estoque */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-card border-border">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="p-3 rounded-full bg-blue-500/10 text-blue-500">
@@ -368,7 +361,9 @@ export default function Inventory() {
               <h3 className="text-2xl font-bold text-foreground">
                 {loading ? "—" : inventoryStats.availableCount}
               </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">veículos em estoque</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                veículos em estoque
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -380,24 +375,15 @@ export default function Inventory() {
             <div>
               <p className="text-sm text-muted-foreground">Valor do Estoque</p>
               <h3 className="text-2xl font-bold text-foreground">
-                {loading ? "—" : new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(inventoryStats.totalValue)}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">soma dos disponíveis</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className={`bg-card border-border ${!loading && inventoryStats.maxDays > 60 ? "border-orange-500/40" : ""}`}>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className={`p-3 rounded-full ${!loading && inventoryStats.maxDays > 60 ? "bg-orange-500/10 text-orange-500" : "bg-muted text-muted-foreground"}`}>
-              <Clock className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Mais Tempo Parado</p>
-              <h3 className={`text-2xl font-bold ${!loading && inventoryStats.maxDays > 60 ? "text-orange-500" : "text-foreground"}`}>
-                {loading ? "—" : `${inventoryStats.maxDays}d`}
+                {loading
+                  ? "—"
+                  : new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(inventoryStats.totalValue)}
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {!loading && inventoryStats.maxDays > 60 ? "atenção: veículo parado" : "dias em estoque"}
+                soma dos disponíveis
               </p>
             </div>
           </CardContent>
@@ -426,35 +412,11 @@ export default function Inventory() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0"
-                    title="Ações em massa"
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setPriceFilter("all");
-                      setTypeFilter("all");
-                      setStatusFilter("all");
-                    }}
-                  >
-                    <Filter className="h-4 w-4 mr-2" />
-                    Limpar todos os filtros
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
 
           {/* Filtros organizados */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border/50">
             {/* Filtro de Preço */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -524,46 +486,6 @@ export default function Inventory() {
               </div>
             </div>
 
-            {/* Filtro de Status */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Filter className="h-3.5 w-3.5" />
-                <span>Status</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Badge
-                  variant={statusFilter === "all" ? "default" : "outline"}
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setStatusFilter("all")}
-                >
-                  Todos
-                </Badge>
-                <Badge
-                  className={cn(
-                    "cursor-pointer hover:scale-105 transition-transform",
-                    statusFilter === "available"
-                      ? "bg-green-500 hover:bg-green-600 text-white border-green-500"
-                      : "border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950",
-                  )}
-                  variant={statusFilter === "available" ? "default" : "outline"}
-                  onClick={() => setStatusFilter("available")}
-                >
-                  Disponível
-                </Badge>
-                <Badge
-                  className={cn(
-                    "cursor-pointer hover:scale-105 transition-transform",
-                    statusFilter === "sold"
-                      ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
-                      : "border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950",
-                  )}
-                  variant={statusFilter === "sold" ? "default" : "outline"}
-                  onClick={() => setStatusFilter("sold")}
-                >
-                  Vendido
-                </Badge>
-              </div>
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -642,14 +564,16 @@ export default function Inventory() {
                       <td className="p-4 align-middle">
                         <img
                           src={vehicle.images?.[0]}
-                          alt=""
+                          alt={`${vehicle.brand} ${vehicle.model}`}
                           className="h-10 w-16 md:h-12 md:w-20 object-cover rounded bg-muted border border-border"
                         />
                       </td>
                       <td className="p-4 align-middle font-medium text-foreground min-w-[150px]">
                         <div>{vehicle.title}</div>
                         {vehicle.status !== "sold" && (
-                          <p className={`text-xs mt-0.5 ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}>
+                          <p
+                            className={`text-xs mt-0.5 ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}
+                          >
                             {getDaysInStock(vehicle)} dias em estoque
                           </p>
                         )}
@@ -724,7 +648,9 @@ export default function Inventory() {
                               <Copy className="h-4 w-4" /> Compartilhar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => navigate(`/admin/estoque/editar/${vehicle.id}`)}
+                              onClick={() =>
+                                navigate(`/admin/estoque/editar/${vehicle.id}`)
+                              }
                               className="flex items-center gap-2"
                             >
                               <Edit className="h-4 w-4" /> Editar
@@ -801,7 +727,9 @@ export default function Inventory() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                onClick={() => handleViewVehicleDetails(vehicle)}
+                                onClick={() =>
+                                  handleViewVehicleDetails(vehicle)
+                                }
                                 className="flex items-center gap-2"
                               >
                                 <Eye className="h-4 w-4" /> Ver Detalhes
@@ -843,7 +771,11 @@ export default function Inventory() {
                                 <Copy className="h-4 w-4" /> Compartilhar
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => navigate(`/admin/estoque/editar/${vehicle.id}`)}
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/estoque/editar/${vehicle.id}`,
+                                  )
+                                }
                                 className="flex items-center gap-2"
                               >
                                 <Edit className="h-4 w-4" /> Editar
@@ -872,7 +804,9 @@ export default function Inventory() {
                                 : "bg-green-500/10 text-green-600"
                             }`}
                           >
-                            {vehicle.status === "sold" ? "vendido" : "disponível"}
+                            {vehicle.status === "sold"
+                              ? "vendido"
+                              : "disponível"}
                           </Badge>
                         </div>
                         <div className="flex items-center justify-between gap-2">
@@ -883,7 +817,9 @@ export default function Inventory() {
                             }).format(vehicle.price)}
                           </p>
                           {vehicle.status !== "sold" && (
-                            <p className={`text-xs ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}>
+                            <p
+                              className={`text-xs ${getDaysInStock(vehicle) > 60 ? "text-orange-500 font-medium" : "text-muted-foreground"}`}
+                            >
                               {getDaysInStock(vehicle)}d em estoque
                             </p>
                           )}
@@ -1105,16 +1041,26 @@ export default function Inventory() {
                     Imagens
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {selectedVehicle.images.map((img, idx) => (
+                    {selectedVehicle.images.map((img: string, idx: number) => (
                       <img
                         key={idx}
                         src={img}
                         alt={`${selectedVehicle.title} - ${idx + 1}`}
                         className="w-full h-32 object-cover rounded-lg border border-border hover:scale-105 transition-transform cursor-pointer"
-                        onClick={() => window.open(img, "_blank")}
+                        onClick={() => {
+                          setLightboxIndex(idx);
+                          setLightboxOpen(true);
+                        }}
                       />
                     ))}
                   </div>
+                  <VehicleLightbox
+                    images={selectedVehicle.images}
+                    isOpen={lightboxOpen}
+                    initialIndex={lightboxIndex}
+                    onClose={() => setLightboxOpen(false)}
+                    vehicleTitle={selectedVehicle.title}
+                  />
                 </div>
               )}
 
@@ -1211,7 +1157,7 @@ export default function Inventory() {
                     <span className="text-xs text-muted-foreground">
                       Preço:
                     </span>
-                    <p className="text-lg font-bold text-primary">
+                    <p className="text-lg font-bold text-green-500">
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
                         currency: "BRL",

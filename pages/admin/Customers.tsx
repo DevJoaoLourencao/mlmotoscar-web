@@ -31,6 +31,7 @@ import {
   Label,
   Skeleton,
 } from "../../components/ui/core";
+import { Textarea } from "../../components/ui/textarea";
 import {
   createCustomer,
   deleteCustomer,
@@ -63,6 +64,7 @@ export default function Customers() {
     phone: "",
     cpf: "",
     birth_date: "",
+    description: "",
   });
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
@@ -97,6 +99,7 @@ export default function Customers() {
       phone: "",
       cpf: "",
       birth_date: "",
+      description: "",
     });
     setIsModalOpen(true);
   };
@@ -110,6 +113,7 @@ export default function Customers() {
       phone: customer.phone,
       cpf: customer.cpf || "",
       birth_date: customer.birth_date || "",
+      description: customer.description || "",
     });
     setIsModalOpen(true);
   };
@@ -576,6 +580,22 @@ export default function Customers() {
                     {validationErrors.birth_date}
                   </p>
                 )}
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label className="text-foreground">Descrição</Label>
+                <Textarea
+                  name="description"
+                  value={formData.description || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  placeholder="Observações sobre o cliente..."
+                  rows={3}
+                  className="bg-background border-input text-foreground resize-none"
+                />
               </div>
             </div>
 

@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSettings } from "../../components/SettingsProvider";
 import { useTheme } from "../../components/ThemeProvider";
@@ -300,6 +301,9 @@ export default function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Mobile Header */}
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-30 bg-card border-b border-border h-16 flex items-center justify-between px-4 shadow-sm"

@@ -13,6 +13,7 @@ import {
 } from "../components/ui/core";
 import { getVehiclesPaginated } from "../services/vehicleService";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { SEO } from "../hooks/useSEO";
 import { Vehicle } from "../types";
 
 const ITEMS_PER_PAGE = 12;
@@ -86,6 +87,11 @@ export default function Catalog() {
 
   return (
     <div className="container mx-auto px-4 py-10 animate-fade-in-up">
+      <SEO
+        title="Catálogo de Veículos"
+        description="Confira nosso catálogo completo de motos e carros seminovos em Marília, SP. Filtre por tipo, preço e encontre o veículo ideal."
+        url="/catalogo"
+      />
       <div className="mb-8 md:mb-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
           <div>

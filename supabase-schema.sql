@@ -65,20 +65,20 @@ CREATE INDEX IF NOT EXISTS idx_vehicles_brand_id ON vehicles(brand_id);
 CREATE INDEX IF NOT EXISTS idx_vehicles_model_id ON vehicles(model_id);
 CREATE INDEX IF NOT EXISTS idx_vehicles_created_at ON vehicles(created_at DESC);
 
--- Tabela de Clientes
+-- Tabela de Clientes (alinhada ao projeto Supabase via MCP)
 CREATE TABLE IF NOT EXISTS customers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   name TEXT NOT NULL,
-  email TEXT NOT NULL,
+  email TEXT,
   phone TEXT NOT NULL,
   cpf TEXT,
-  city TEXT,
-  status TEXT DEFAULT 'lead' CHECK (status IN ('lead', 'cliente', 'arquivado'))
+  birth_date TEXT,
+  description TEXT
 );
 
 -- Índices para clientes
-CREATE INDEX IF NOT EXISTS idx_customers_status ON customers(status);
+CREATE UNIQUE INDEX IF NOT EXISTS customers_cpf_unique ON customers(cpf);
 CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
 CREATE INDEX IF NOT EXISTS idx_customers_created_at ON customers(created_at DESC);
 

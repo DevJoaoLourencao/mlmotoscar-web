@@ -37,7 +37,7 @@ export default function AddVehicle() {
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Vehicle>>({
-    type: "carro",
+    type: "moto",
     brand_id: "",
     model_id: "",
     brand: "",

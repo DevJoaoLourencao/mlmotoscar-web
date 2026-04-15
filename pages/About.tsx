@@ -1,5 +1,6 @@
 import { Award, Shield, Target, Users } from "lucide-react";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { SEO } from "../hooks/useSEO";
 import { VehicleGallery } from "../components/VehicleGallery";
 import { Card, CardContent } from "../components/ui/core";
 
@@ -31,6 +32,11 @@ export default function About() {
   usePageTitle("Nossa História");
   return (
     <div className="flex flex-col min-h-screen">
+      <SEO
+        title="Nossa História"
+        description="Conheça a ML MOTOSCAR, concessionária de motos e carros seminovos em Marília, SP. Anos de tradição, confiança e qualidade."
+        url="/sobre"
+      />
       {/* Hero */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center overflow-hidden">
         <div

@@ -2,6 +2,7 @@ import { Clock, ExternalLink, MessageCircle, Phone, Send } from "lucide-react";
 import React, { useState } from "react";
 import { useSettings } from "../components/SettingsProvider";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { SEO } from "../hooks/useSEO";
 import { Button, Card, CardContent, Input, Label } from "../components/ui/core";
 
 export default function Contact() {
@@ -26,6 +27,11 @@ export default function Contact() {
 
   return (
     <div className="container mx-auto px-10 md:px-4 py-10 md:py-24 animate-fade-in-up">
+      <SEO
+        title="Fale Conosco"
+        description="Entre em contato com a ML MOTOSCAR. Estamos em Marília, SP, prontos para ajudar você a encontrar o veículo ideal. WhatsApp, telefone e endereço."
+        url="/contato"
+      />
       <div className="text-center mb-8 md:mb-12">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">
           Fale Conosco

@@ -28,12 +28,11 @@ export async function uploadImage(
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(filePath, file, {
-        cacheControl: "3600",
+        cacheControl: "31536000",
         upsert: false,
       });
 
     if (error) {
-      console.error("Erro ao fazer upload:", error);
       throw new Error(`Erro ao fazer upload: ${error.message}`);
     }
 
@@ -42,12 +41,8 @@ export async function uploadImage(
       data: { publicUrl },
     } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
 
-    console.log("✅ Upload realizado. URL:", publicUrl);
-    console.log("📁 Path:", filePath);
-
     return publicUrl;
   } catch (error) {
-    console.error("Erro no upload da imagem:", error);
     throw error;
   }
 }
@@ -75,8 +70,7 @@ export async function uploadMultipleImages(
       if (onProgress) {
         onProgress(i + 1, files.length);
       }
-    } catch (error) {
-      console.error(`Erro ao fazer upload da imagem ${i + 1}:`, error);
+    } catch {
       // Continuar com as próximas imagens mesmo se uma falhar
     }
   }
@@ -97,7 +91,6 @@ export async function deleteImage(imageUrl: string): Promise<void> {
     );
 
     if (pathParts.length < 2) {
-      console.error("URL inválida:", imageUrl);
       return;
     }
 
@@ -108,11 +101,9 @@ export async function deleteImage(imageUrl: string): Promise<void> {
       .remove([filePath]);
 
     if (error) {
-      console.error("Erro ao deletar imagem:", error);
       throw new Error(`Erro ao deletar imagem: ${error.message}`);
     }
-  } catch (error) {
-    console.error("Erro ao deletar imagem:", error);
+  } catch {
     // Não lançar erro para não bloquear a exclusão do veículo
   }
 }

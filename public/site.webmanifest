@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "ML MOTOSCAR - Concessionaria de Motos e Carros",
+  "short_name": "ML MOTOSCAR",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#FF0000",
+  "background_color": "#000000",
   "display": "standalone"
 }

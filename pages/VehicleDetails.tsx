@@ -21,6 +21,7 @@ import {
 } from "../components/ui/core";
 import { getVehicleById } from "../services/vehicleService";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { SEO } from "../hooks/useSEO";
 import { Vehicle } from "../types";
 
 export default function VehicleDetails() {
@@ -86,7 +87,8 @@ export default function VehicleDetails() {
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const message = `Olá, vi o anúncio ${vehicle.title} no site da ${settings.storeName}.\n\n *Nome*: ${contactForm.name}.\n\n *Mensagem*: ${contactForm.message}\n\n`;
-    const url = `https://wa.me/5514991569560?text=${encodeURIComponent(
+    const cleanPhone = settings.phoneSecondary?.replace(/\D/g, '') || '14991569560';
+    const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(
       message,
     )}`;
     window.open(url, "_blank");
@@ -267,8 +269,38 @@ export default function VehicleDetails() {
     setIsInstallmentModalOpen(false);
   };
 
+  const vehicleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Vehicle",
+    "name": `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    "brand": { "@type": "Brand", "name": vehicle.brand },
+    "model": vehicle.model,
+    "modelDate": String(vehicle.year),
+    "image": images[0] || undefined,
+    "mileageFromOdometer": {
+      "@type": "QuantitativeValue",
+      "value": vehicle.mileage,
+      "unitCode": "KMT",
+    },
+    "color": vehicle.color || undefined,
+    "offers": {
+      "@type": "Offer",
+      "price": vehicle.price,
+      "priceCurrency": "BRL",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "AutoDealer", "name": "ML MOTOSCAR" },
+    },
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <SEO
+        title={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+        description={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - ${vehicle.mileage.toLocaleString()} km - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(vehicle.price)}. Seminovo com qualidade na ML MOTOSCAR, Marília SP.`}
+        image={images[0]}
+        url={`/catalogo/${vehicle.id}`}
+        jsonLd={vehicleJsonLd}
+      />
       {/* Vehicle Gallery */}
       {images.length > 0 && (
         <div className="w-full mt-4 md:mt-6 mb-6 md:mb-8">

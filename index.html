@@ -14,22 +14,21 @@
 
   <!-- Meta Tags -->
   <meta name="theme-color" content="#FF0000" />
-  <meta name="description" content="ML MOTOSCAR — concessionária de motos e carros em Marília, SP. Amplo estoque de seminovos com qualidade, segurança e preço justo. Financiamento disponível." />
+  <meta name="description"
+    content="ML MOTOSCAR — concessionária de motos e carros em Marília, SP. Amplo estoque de seminovos com qualidade, segurança e preço justo. Financiamento disponível." />
   <meta name="keywords" content="motos, carros, concessionária, Marília, SP, seminovos, financiamento, ML MOTOSCAR" />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="ML MOTOSCAR" />
 
-  <!-- Security Headers -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <!-- Referrer Policy (complementa o header do vercel.json) -->
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://mlmotoscarmarilia.com.br/" />
   <meta property="og:title" content="ML MOTOSCAR | Concessionária de Motos e Carros em Marília - SP" />
-  <meta property="og:description" content="Amplo estoque de motos e carros seminovos em Marília, SP. Qualidade, segurança e preço justo. Financiamento disponível." />
+  <meta property="og:description"
+    content="Amplo estoque de motos e carros seminovos em Marília, SP. Qualidade, segurança e preço justo. Financiamento disponível." />
   <meta property="og:image" content="https://mlmotoscarmarilia.com.br/logo.png" />
   <meta property="og:locale" content="pt_BR" />
   <meta property="og:site_name" content="ML MOTOSCAR" />
@@ -86,8 +85,12 @@
   }
   </script>
 
-  <!-- Preconnect para CDN -->
+  <!-- Preload LCP poster image -->
+  <link rel="preload" href="/moto-poster.jpg" as="image" fetchpriority="high" />
+
+  <!-- Preload + Preconnect para CDN -->
   <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+  <link rel="preload" href="https://cdn.tailwindcss.com" as="script" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -196,8 +199,8 @@
         --card-foreground: 0 0% 98%;
         --popover: 0 0% 3.9%;
         --popover-foreground: 0 0% 98%;
-        --primary: 0 100% 50%;
-        /* Vivid Red */
+        --primary: 0 85% 38%;
+        /* Dark Red for WCAG AA contrast (4.66:1 with white) */
         --primary-foreground: 0 0% 98%;
         --secondary: 0 0% 14.9%;
         --secondary-foreground: 0 0% 98%;
@@ -271,19 +274,6 @@
       scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
     }
   </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
-    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0"
-  }
-}
-</script>
-  <link rel="stylesheet" href="/index.css">
 </head>
 
 <body

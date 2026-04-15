@@ -57,7 +57,6 @@ export default function ImageUpload({
         }
       );
 
-      console.log("✅ Upload concluído. URLs:", urls);
       onChange([...images, ...urls]);
 
       // Limpar input file
@@ -65,7 +64,6 @@ export default function ImageUpload({
         fileInputRef.current.value = "";
       }
     } catch (err) {
-      console.error("Erro ao fazer upload:", err);
       setError("Erro ao fazer upload das imagens. Tente novamente.");
     } finally {
       setUploading(false);
@@ -80,9 +78,7 @@ export default function ImageUpload({
     if (imageToRemove.includes("supabase.co/storage")) {
       try {
         await deleteImage(imageToRemove);
-        console.log("🗑️ Imagem deletada do storage:", imageToRemove);
-      } catch (error) {
-        console.error("Erro ao deletar imagem:", error);
+      } catch {
         // Continuar mesmo se der erro na deleção
       }
     }
@@ -185,12 +181,8 @@ export default function ImageUpload({
                 alt={`Preview ${index}`}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  console.error("❌ Erro ao carregar imagem:", img);
                   e.currentTarget.src =
                     "https://via.placeholder.com/300?text=Erro+ao+carregar";
-                }}
-                onLoad={() => {
-                  console.log("✅ Imagem carregada:", img);
                 }}
               />
               <button

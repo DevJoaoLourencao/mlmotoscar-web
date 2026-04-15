@@ -17,6 +17,7 @@ import {
   AdminPageContainer,
   AdminPageHeader,
 } from "../../components/AdminPageComponents";
+import PaymentMethodBadge from "../../components/PaymentMethodBadge";
 import { Combobox } from "../../components/ui/combobox";
 import {
   Badge,
@@ -50,8 +51,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import PaymentMethodBadge from "../../components/PaymentMethodBadge";
-import { formatCurrencyBRL, formatCurrencyInput, parseCurrencyInput } from "../../utils/formatters";
 import { createCustomer, getCustomers } from "../../services/customerService";
 import { createSale, getSales } from "../../services/salesService";
 import { getVehicles } from "../../services/vehicleService";
@@ -62,6 +61,11 @@ import {
   Sale,
   Vehicle,
 } from "../../types";
+import {
+  formatCurrencyBRL,
+  formatCurrencyInput,
+  parseCurrencyInput,
+} from "../../utils/formatters";
 import { validateSale } from "../../validations/saleSchema";
 
 export default function Sales() {
@@ -101,7 +105,7 @@ export default function Sales() {
 
     const totalSalesThisMonth = salesThisMonth.reduce(
       (sum, sale) => sum + sale.payment.total_value,
-      0
+      0,
     );
 
     const completedSales = sales.filter((s) => s.status === "completed");
@@ -298,7 +302,7 @@ export default function Sales() {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -640,7 +644,7 @@ export default function Sales() {
                 <Input
                   type="text"
                   value={formatCurrencyBRL(
-                    formData.totalValue - formData.entryValue
+                    formData.totalValue - formData.entryValue,
                   )}
                   readOnly
                   className="bg-muted text-muted-foreground cursor-not-allowed"
@@ -675,7 +679,7 @@ export default function Sales() {
                 type="text"
                 name="installmentValue"
                 value={formatCurrencyInput(
-                  String(formData.installmentValue * 100)
+                  String(formData.installmentValue * 100),
                 )}
                 readOnly
                 placeholder="R$ 0,00"
@@ -757,7 +761,7 @@ export default function Sales() {
               <span className="text-muted-foreground">Saldo a Pagar:</span>
               <span className="font-bold">
                 {formatCurrencyBRL(
-                  payment.total_value - (payment.trade_in_value || 0)
+                  payment.total_value - (payment.trade_in_value || 0),
                 )}
               </span>
             </div>
@@ -780,7 +784,7 @@ export default function Sales() {
               <span className="text-muted-foreground">Valor a Parcelar:</span>
               <span>
                 {formatCurrencyBRL(
-                  payment.total_value - (payment.entry_value || 0)
+                  payment.total_value - (payment.entry_value || 0),
                 )}
               </span>
             </div>
@@ -816,7 +820,7 @@ export default function Sales() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-card border-border shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="p-3 rounded-full bg-green-500/10 text-green-500">
@@ -856,28 +860,6 @@ export default function Sales() {
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
                     veículos concluídos
-                  </p>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-purple-500/10 text-purple-500">
-              <DollarSign className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Ticket Médio</p>
-              {loading ? (
-                <Skeleton className="h-8 w-32 mt-1" />
-              ) : (
-                <>
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {formatCurrencyBRL(stats.averageTicket)}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    média do mês atual
                   </p>
                 </>
               )}
@@ -958,7 +940,7 @@ export default function Sales() {
                             false) ||
                           sale.vehicle_title
                             .toLowerCase()
-                            .includes(search.toLowerCase())
+                            .includes(search.toLowerCase()),
                       )
                       .map((sale) => (
                         <tr
@@ -1021,7 +1003,7 @@ export default function Sales() {
                           false) ||
                         sale.vehicle_title
                           .toLowerCase()
-                          .includes(search.toLowerCase())
+                          .includes(search.toLowerCase()),
                     ).length === 0 && (
                     <tr>
                       <td
@@ -1047,7 +1029,9 @@ export default function Sales() {
           onClose={closeModal}
         >
           <DialogHeader className="pb-4">
-            <DialogTitle className="text-lg sm:text-xl">Registrar Nova Venda</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">
+              Registrar Nova Venda
+            </DialogTitle>
             <DialogDescription className="text-sm">
               Preencha os dados da venda abaixo.
             </DialogDescription>
@@ -1067,7 +1051,7 @@ export default function Sales() {
                       {Object.entries(validationErrors).map(
                         ([field, error]) => (
                           <li key={field}>{error}</li>
-                        )
+                        ),
                       )}
                     </ul>
                   </div>
@@ -1272,7 +1256,7 @@ export default function Sales() {
                     type="text"
                     name="totalValue"
                     value={formatCurrencyInput(
-                      String(formData.totalValue * 100)
+                      String(formData.totalValue * 100),
                     )}
                     onChange={(e) =>
                       handleCurrencyChange("totalValue", e.target.value)
@@ -1354,7 +1338,7 @@ export default function Sales() {
                     </span>
                     <span className="font-medium">
                       {new Date(selectedSale.created_at).toLocaleString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </span>
                   </div>
@@ -1365,15 +1349,15 @@ export default function Sales() {
                         selectedSale.status === "completed"
                           ? "default"
                           : selectedSale.status === "pending"
-                          ? "secondary"
-                          : "destructive"
+                            ? "secondary"
+                            : "destructive"
                       }
                     >
                       {selectedSale.status === "completed"
                         ? "Concluída"
                         : selectedSale.status === "pending"
-                        ? "Pendente"
-                        : "Cancelada"}
+                          ? "Pendente"
+                          : "Cancelada"}
                     </Badge>
                   </div>
                 </div>
@@ -1453,8 +1437,14 @@ export default function Sales() {
       </Dialog>
 
       {/* Sale Success Dialog */}
-      <Dialog open={!!saleSuccessData} onOpenChange={(open) => !open && setSaleSuccessData(null)}>
-        <DialogContent className="sm:max-w-md" onClose={() => setSaleSuccessData(null)}>
+      <Dialog
+        open={!!saleSuccessData}
+        onOpenChange={(open) => !open && setSaleSuccessData(null)}
+      >
+        <DialogContent
+          className="sm:max-w-md"
+          onClose={() => setSaleSuccessData(null)}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-green-600">
               <CreditCard className="h-5 w-5" /> Venda Registrada!
@@ -1468,10 +1458,7 @@ export default function Sales() {
             Deseja gerar o contrato de compra e venda agora?
           </p>
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setSaleSuccessData(null)}
-            >
+            <Button variant="outline" onClick={() => setSaleSuccessData(null)}>
               Fechar
             </Button>
             <Button

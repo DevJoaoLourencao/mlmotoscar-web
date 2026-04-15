@@ -17,6 +17,7 @@ import VehicleCard from "../components/VehicleCard";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/core";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { SEO } from "../hooks/useSEO";
 import { getReviews } from "../services/reviewsService";
 import { getVehicles } from "../services/vehicleService";
 import { Review, Vehicle } from "../types";
@@ -59,6 +60,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SEO url="/" />
       {/* Hero Section */}
       <section className="relative mt-[-80px] h-[900px] flex items-center overflow-hidden">
         <video
@@ -66,6 +68,8 @@ export default function Home() {
           loop
           muted
           playsInline
+          preload="auto"
+          poster="/moto-poster.jpg"
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
           style={{ objectPosition: "center 40%", opacity: 0.5 }}
         >
@@ -110,23 +114,18 @@ export default function Home() {
               FINANCIAMENTO
             </Badge>
           </div>
-          <div className="px-4 md:px-0 flex flex-col md:flex-row gap-4 md:gap-6 justify-center md:justify-start">
-            <Link to="/contato" className="w-full md:w-auto">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full bg-transparent border-white/50 text-white hover:bg-white hover:text-black"
-              >
-                Fale Conosco
-              </Button>
+          <div className="px-4 md:px-0 flex flex-col md:flex-row gap-6 justify-center md:justify-start">
+            <Link
+              to="/contato"
+              className="inline-flex items-center justify-center w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-6 rounded-full bg-transparent border border-white/50 text-white hover:bg-white hover:text-black transition-all duration-300 min-h-[48px] font-medium"
+            >
+              Fale Conosco
             </Link>
-            <Link to="/catalogo" className="w-full md:w-auto">
-              <Button
-                size="lg"
-                className="w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-5 md:py-6 rounded-full"
-              >
-                Ver Estoque <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+            <Link
+              to="/catalogo"
+              className="inline-flex items-center justify-center w-full md:w-auto text-base md:text-lg px-8 md:px-10 py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 min-h-[48px] font-medium"
+            >
+              Ver Estoque <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </div>
@@ -139,9 +138,9 @@ export default function Home() {
             <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
               <ShieldCheck className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
-            <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
+            <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
               Transparência Total
-            </h3>
+            </h2>
             <p className="text-muted-foreground text-sm md:text-lg font-light leading-relaxed">
               Transparência total em todos os processos, desde a compra até a
               venda.
@@ -151,9 +150,9 @@ export default function Home() {
             <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
               <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
-            <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
+            <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
               Garantia de Qualidade
-            </h3>
+            </h2>
             <p className="text-muted-foreground text-sm md:text-lg font-light leading-relaxed">
               Veículos revisados e com histórico verificado para sua segurança.
             </p>
@@ -162,9 +161,9 @@ export default function Home() {
             <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
               <DollarSign className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
-            <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
+            <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-foreground">
               Preço Justo
-            </h3>
+            </h2>
             <p className="text-muted-foreground text-sm md:text-lg font-light leading-relaxed">
               Valores que cabem no bolso, sem surpresas.
             </p>
@@ -186,7 +185,7 @@ export default function Home() {
             </div>
             <Link
               to="/catalogo"
-              className="hidden md:flex text-primary hover:text-primary/80 transition-colors items-center font-medium text-sm md:text-base"
+              className="hidden md:flex text-red-700 dark:text-red-500 hover:text-red-800 dark:hover:text-red-400 transition-colors items-center font-medium text-sm md:text-base"
             >
               Ver estoque completo <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -302,7 +301,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch">
               <a
-                href="https://wa.me/5514991569560"
+                href={`https://wa.me/55${settings.phoneSecondary?.replace(/\D/g, '') || '14991569560'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block group h-full"

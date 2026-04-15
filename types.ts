@@ -80,6 +80,7 @@ export interface Customer {
   phone: string;
   cpf?: string;
   birth_date?: string;
+  description?: string;
   created_at: string;
 }
 
