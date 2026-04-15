@@ -117,18 +117,18 @@ export default function AdminLayout() {
         </div>
       </Link>
       <Link
-        to="/admin/anuncios"
+        to="/admin/vendas"
         className={isSidebarCollapsed ? "block mb-3" : "block"}
       >
         <div
           className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/anuncios",
+            "/admin/vendas",
           )}`}
-          title={isSidebarCollapsed ? "Anúncios" : ""}
+          title={isSidebarCollapsed ? "Vendas" : ""}
         >
-          <Megaphone className="h-4 w-4 flex-shrink-0" />
+          <DollarSign className="h-4 w-4 flex-shrink-0" />
           {!isSidebarCollapsed && (
-            <span className="text-sm md:text-base">Anúncios</span>
+            <span className="text-sm md:text-base">Vendas</span>
           )}
         </div>
       </Link>
@@ -149,6 +149,22 @@ export default function AdminLayout() {
         </div>
       </Link>
       <Link
+        to="/admin/anuncios"
+        className={isSidebarCollapsed ? "block mb-3" : "block"}
+      >
+        <div
+          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
+            "/admin/anuncios",
+          )}`}
+          title={isSidebarCollapsed ? "Anúncios" : ""}
+        >
+          <Megaphone className="h-4 w-4 flex-shrink-0" />
+          {!isSidebarCollapsed && (
+            <span className="text-sm md:text-base">Anúncios</span>
+          )}
+        </div>
+      </Link>
+      <Link
         to="/admin/financiamento"
         className={isSidebarCollapsed ? "block mb-3" : "block"}
       >
@@ -161,22 +177,6 @@ export default function AdminLayout() {
           <Calculator className="h-4 w-4 flex-shrink-0" />
           {!isSidebarCollapsed && (
             <span className="text-sm md:text-base">Simulador</span>
-          )}
-        </div>
-      </Link>
-      <Link
-        to="/admin/vendas"
-        className={isSidebarCollapsed ? "block mb-3" : "block"}
-      >
-        <div
-          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/vendas",
-          )}`}
-          title={isSidebarCollapsed ? "Vendas" : ""}
-        >
-          <DollarSign className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && (
-            <span className="text-sm md:text-base">Vendas</span>
           )}
         </div>
       </Link>

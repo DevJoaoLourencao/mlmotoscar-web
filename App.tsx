@@ -16,10 +16,10 @@ import { useTheme } from "./components/ThemeProvider";
 import { Button, Skeleton } from "./components/ui/core";
 import { useFavicon } from "./hooks/useFavicon";
 import About from "./pages/About";
-import NotFound from "./pages/NotFound";
 import Catalog from "./pages/Catalog";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
 import VehicleDetails from "./pages/VehicleDetails";
 import AddVehicle from "./pages/admin/AddVehicle";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -167,7 +167,7 @@ const AdminDashboard = () => {
               <Skeleton className="h-8 w-32 mt-2" />
             ) : (
               <>
-                <p className="text-xl font-bold mt-2 text-primary break-words overflow-wrap-anywhere">
+                <p className="text-xl font-bold mt-2 text-white break-words overflow-wrap-anywhere">
                   {formatCurrencyBRL(stats.totalValue)}
                 </p>
                 <span className="text-xs text-muted-foreground flex items-center mt-2">
