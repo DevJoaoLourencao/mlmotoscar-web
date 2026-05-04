@@ -29,7 +29,6 @@ import Customers from "./pages/admin/Customers";
 import Financing from "./pages/admin/Financing";
 import Inventory from "./pages/admin/Inventory";
 import Login from "./pages/admin/Login";
-import Payments from "./pages/admin/Payments";
 import Sales from "./pages/admin/Sales";
 import SettingsPage from "./pages/admin/Settings";
 import { getSales } from "./services/salesService";
@@ -291,7 +290,6 @@ function AppRoutes() {
         <Route path="estoque/novo" element={<AddVehicle />} />
         <Route path="estoque/editar/:id" element={<AddVehicle />} />
         <Route path="vendas" element={<Sales />} />
-        <Route path="pagamentos" element={<Payments />} />
         <Route path="clientes" element={<Customers />} />
         <Route path="financiamento" element={<Financing />} />
         <Route path="contratos" element={<Contracts />} />

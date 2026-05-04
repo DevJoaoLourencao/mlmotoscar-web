@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   brand TEXT NOT NULL, -- Mantido para compatibilidade e busca
   model TEXT NOT NULL, -- Mantido para compatibilidade e busca
   price NUMERIC(12, 2) NOT NULL,
+  purchase_price NUMERIC(12, 2), -- Custo de aquisição (uso interno)
   year INTEGER NOT NULL,
   mileage INTEGER NOT NULL DEFAULT 0,
   fuel TEXT NOT NULL,
@@ -86,10 +87,10 @@ CREATE INDEX IF NOT EXISTS idx_customers_created_at ON customers(created_at DESC
 CREATE TABLE IF NOT EXISTS sales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE SET NULL,
+  vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
   vehicle_title TEXT NOT NULL,
-  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE SET NULL,
-  customer_name TEXT NOT NULL,
+  customer_id UUID REFERENCES customers(id) ON DELETE SET NULL, -- Opcional: venda sem cliente cadastrado
+  customer_name TEXT, -- Opcional: venda sem cliente cadastrado
   payment JSONB NOT NULL, -- Armazena PaymentDetails como JSON
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'canceled')),
   notes TEXT
@@ -101,38 +102,42 @@ CREATE INDEX IF NOT EXISTS idx_sales_customer_id ON sales(customer_id);
 CREATE INDEX IF NOT EXISTS idx_sales_status ON sales(status);
 CREATE INDEX IF NOT EXISTS idx_sales_created_at ON sales(created_at DESC);
 
--- Tabela de Histórico de Pagamentos
-CREATE TABLE IF NOT EXISTS payment_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sale_id UUID NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
-  date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  amount NUMERIC(12, 2) NOT NULL,
-  note TEXT,
-  type TEXT NOT NULL CHECK (type IN ('installment', 'settlement'))
-);
-
--- Índices para histórico de pagamentos
-CREATE INDEX IF NOT EXISTS idx_payment_history_sale_id ON payment_history(sale_id);
-CREATE INDEX IF NOT EXISTS idx_payment_history_date ON payment_history(date);
-
 -- Tabela de Configurações (apenas uma linha)
 CREATE TABLE IF NOT EXISTS settings (
   id TEXT PRIMARY KEY DEFAULT 'main',
   store_name TEXT NOT NULL DEFAULT 'MLMOTOSCAR',
+  logo_light TEXT, -- URL da logo para tema claro
+  logo_dark TEXT,  -- URL da logo para tema escuro
+  favicon TEXT,    -- URL do favicon dinâmico
   primary_color TEXT NOT NULL DEFAULT '#ff0000',
   secondary_color TEXT NOT NULL DEFAULT '#1f2937',
   whatsapp_color TEXT DEFAULT '#25D366',
   navbar_color TEXT,
   sidebar_color TEXT,
-  phone_primary TEXT NOT NULL,
-  phone_secondary TEXT NOT NULL,
-  email_contact TEXT NOT NULL,
-  address TEXT NOT NULL,
-  opening_hours_weekdays TEXT NOT NULL,
-  opening_hours_weekend TEXT NOT NULL,
+  phone_primary TEXT NOT NULL DEFAULT '',
+  phone_primary_name TEXT,
+  phone_secondary TEXT NOT NULL DEFAULT '',
+  phone_secondary_name TEXT,
+  email_contact TEXT NOT NULL DEFAULT '',
+  address TEXT NOT NULL DEFAULT '',
+  city TEXT,
+  state TEXT,
+  opening_hours_weekdays TEXT NOT NULL DEFAULT '',
+  opening_hours_weekend TEXT NOT NULL DEFAULT '',
   google_maps_url TEXT,
+  google_reviews_url TEXT,
+  google_write_review_url TEXT,
   social_instagram TEXT,
   social_facebook TEXT,
+  -- Dados do vendedor para contratos PDF
+  seller_name TEXT,
+  seller_rg TEXT,
+  seller_cpf TEXT,
+  seller_address TEXT,
+  seller_city TEXT,
+  seller_state TEXT,
+  seller_cep TEXT,
+  seller_phone TEXT,
   default_theme TEXT DEFAULT 'dark' CHECK (default_theme IN ('dark', 'light')),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -153,9 +158,19 @@ CREATE TRIGGER update_settings_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- Inserir configurações padrão se não existirem
-INSERT INTO settings (id) 
+INSERT INTO settings (id)
 VALUES ('main')
 ON CONFLICT (id) DO NOTHING;
+
+-- Tabela de Avaliações (Reviews)
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  name TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  text TEXT NOT NULL,
+  active BOOLEAN DEFAULT true
+);
 
 -- ============================================
 -- RLS (Row Level Security) Policies
@@ -167,8 +182,8 @@ ALTER TABLE models ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vehicles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payment_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para vehicles (público pode ler, apenas autenticados podem escrever)
 CREATE POLICY "Vehicles são públicos para leitura"
@@ -221,23 +236,6 @@ CREATE POLICY "Apenas usuários autenticados podem deletar vendas"
   ON sales FOR DELETE
   USING (auth.role() = 'authenticated');
 
--- Políticas para payment_history (apenas autenticados)
-CREATE POLICY "Apenas usuários autenticados podem ver histórico de pagamentos"
-  ON payment_history FOR SELECT
-  USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Apenas usuários autenticados podem inserir histórico de pagamentos"
-  ON payment_history FOR INSERT
-  WITH CHECK (auth.role() = 'authenticated');
-
-CREATE POLICY "Apenas usuários autenticados podem atualizar histórico de pagamentos"
-  ON payment_history FOR UPDATE
-  USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Apenas usuários autenticados podem deletar histórico de pagamentos"
-  ON payment_history FOR DELETE
-  USING (auth.role() = 'authenticated');
-
 -- Políticas para settings (público pode ler, apenas autenticados podem escrever)
 CREATE POLICY "Settings são públicos para leitura"
   ON settings FOR SELECT
@@ -283,5 +281,22 @@ CREATE POLICY "Apenas usuários autenticados podem atualizar modelos"
 
 CREATE POLICY "Apenas usuários autenticados podem deletar modelos"
   ON models FOR DELETE
+  USING (auth.role() = 'authenticated');
+
+-- Políticas para reviews (público pode ler ativas, apenas autenticados gerenciam)
+CREATE POLICY "Reviews ativas são públicas para leitura"
+  ON reviews FOR SELECT
+  USING (true);
+
+CREATE POLICY "Apenas usuários autenticados podem inserir reviews"
+  ON reviews FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Apenas usuários autenticados podem atualizar reviews"
+  ON reviews FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Apenas usuários autenticados podem deletar reviews"
+  ON reviews FOR DELETE
   USING (auth.role() = 'authenticated');
 

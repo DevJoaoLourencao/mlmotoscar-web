@@ -322,7 +322,7 @@ export default function Home() {
               </a>
 
               <a
-                href="https://www.google.com/maps/search/?api=1&query=R.+Felipe+Camarão,+113+-+Lorenzetti,+Marília+-+SP,+17506-320"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block group cursor-pointer h-full"
@@ -333,7 +333,7 @@ export default function Home() {
                     Visite a Loja
                   </h3>
                   <p className="text-xs md:text-sm text-muted-foreground">
-                    R. Felipe Camarão, 113 - Lorenzetti, Marília - SP, 17506-320
+                    {settings.address}
                   </p>
                 </div>
               </a>

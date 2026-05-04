@@ -14,7 +14,6 @@ import {
   Settings,
   Sun,
   Users,
-  Wallet,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -194,22 +193,6 @@ export default function AdminLayout() {
           <FileCheck className="h-4 w-4 flex-shrink-0" />
           {!isSidebarCollapsed && (
             <span className="text-sm md:text-base">Contratos</span>
-          )}
-        </div>
-      </Link>
-      <Link
-        to="/admin/pagamentos"
-        className={isSidebarCollapsed ? "block mb-3" : "block"}
-      >
-        <div
-          className={`flex items-center ${isSidebarCollapsed ? "justify-center gap-0" : "gap-3"} px-3 py-2 rounded-md transition-colors ${isActive(
-            "/admin/pagamentos",
-          )}`}
-          title={isSidebarCollapsed ? "Pagamentos" : ""}
-        >
-          <Wallet className="h-4 w-4 flex-shrink-0" />
-          {!isSidebarCollapsed && (
-            <span className="text-sm md:text-base">Pagamentos</span>
           )}
         </div>
       </Link>

@@ -1,4 +1,4 @@
-import { Clock, ExternalLink, MessageCircle, Phone, Send } from "lucide-react";
+import { Clock, ExternalLink, MessageCircle, Phone } from "lucide-react";
 import React, { useState } from "react";
 import { useSettings } from "../components/SettingsProvider";
 import { usePageTitle } from "../hooks/usePageTitle";
@@ -22,7 +22,9 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Mensagem enviada com sucesso! Entraremos em contato em breve.");
+    const phone = settings.phonePrimary.replace(/\D/g, '');
+    const text = `Olá, meu nome é ${formData.name}. ${formData.message}`;
+    window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -139,9 +141,7 @@ export default function Contact() {
             />
             <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10">
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  "R. Felipe Camarão, 113 - Lorenzetti, Marília - SP, 17506-320"
-                )}`}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -198,7 +198,7 @@ export default function Contact() {
                   !formData.message.trim()
                 }
               >
-                <Send className="mr-2 h-4 w-4" /> Enviar Mensagem
+                <MessageCircle className="mr-2 h-4 w-4" /> Enviar via WhatsApp
               </Button>
             </form>
           </CardContent>

@@ -115,31 +115,37 @@ export default function Footer() {
               <li className="flex items-start space-x-3">
                 <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm font-semibold text-foreground">Wagner Lourenção</span>
-                  <a 
-                    href="tel:+5514997036375" 
+                  {settings.phonePrimaryName && (
+                    <span className="text-sm font-semibold text-foreground">{settings.phonePrimaryName}</span>
+                  )}
+                  <a
+                    href={`tel:+55${formatPhoneForWhatsApp(settings.phonePrimary)}`}
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    (14) 99703-6375
+                    {settings.phonePrimary}
                   </a>
                 </div>
               </li>
-              <li className="flex items-start space-x-3">
-                <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-semibold text-foreground">João Lourenção</span>
-                  <a 
-                    href="tel:+5514991569560" 
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    (14) 99156-9560
-                  </a>
-                </div>
-              </li>
+              {settings.phoneSecondary && (
+                <li className="flex items-start space-x-3">
+                  <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-1">
+                    {settings.phoneSecondaryName && (
+                      <span className="text-sm font-semibold text-foreground">{settings.phoneSecondaryName}</span>
+                    )}
+                    <a
+                      href={`tel:+55${formatPhoneForWhatsApp(settings.phoneSecondary)}`}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {settings.phoneSecondary}
+                    </a>
+                  </div>
+                </li>
+              )}
               <li className="flex items-start space-x-3">
                 <MessageCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <a 
-                  href={`https://wa.me/55${formatPhoneForWhatsApp('(14) 99156-9560')}`}
+                <a
+                  href={`https://wa.me/55${formatPhoneForWhatsApp(settings.phonePrimary)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
@@ -158,12 +164,12 @@ export default function Footer() {
             <div className="flex items-start space-x-3 text-muted-foreground mb-4">
               <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
               <a
-                href="https://www.google.com/maps/search/?api=1&query=R.+Felipe+Camarão,+113+-+Lorenzetti,+Marília+-+SP,+17506-320"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors"
               >
-                R. Felipe Camarão, 113 - Lorenzetti, Marília - SP, 17506-320
+                {settings.address}
               </a>
             </div>
             <div className="bg-muted rounded p-3 text-xs text-muted-foreground border border-border">

@@ -106,14 +106,6 @@ export interface PaymentDetails {
   installment_value?: number;
 }
 
-export interface PaymentHistory {
-  id: string;
-  date: string;
-  amount: number;
-  note?: string;
-  type: "installment" | "settlement";
-}
-
 export interface Sale {
   id: string;
   created_at: string;
@@ -122,7 +114,6 @@ export interface Sale {
   customer_id?: string | null; // Opcional - pode ser null para vendas sem cliente
   customer_name?: string | null; // Opcional - pode ser null para vendas sem cliente
   payment: PaymentDetails;
-  payment_history?: PaymentHistory[]; // Track payments for promissory
   status: "pending" | "completed" | "canceled";
   notes?: string;
 }

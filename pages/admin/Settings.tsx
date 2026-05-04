@@ -456,11 +456,32 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
+                <Label>Nome — Telefone Principal</Label>
+                <Input
+                  name="phonePrimaryName"
+                  value={formData.phonePrimaryName || ""}
+                  onChange={handleInputChange}
+                  placeholder="Ex: Wagner Lourenção"
+                  className="bg-background text-foreground"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Nome — Telefone Secundário</Label>
+                <Input
+                  name="phoneSecondaryName"
+                  value={formData.phoneSecondaryName || ""}
+                  onChange={handleInputChange}
+                  placeholder="Ex: João Lourenção"
+                  className="bg-background text-foreground"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Telefone Principal (WhatsApp)</Label>
                 <Input
                   name="phonePrimary"
                   value={formData.phonePrimary || ""}
                   onChange={handleInputChange}
+                  placeholder="(00) 00000-0000"
                   className="bg-background text-foreground"
                 />
               </div>
@@ -470,6 +491,7 @@ export default function SettingsPage() {
                   name="phoneSecondary"
                   value={formData.phoneSecondary || ""}
                   onChange={handleInputChange}
+                  placeholder="(00) 00000-0000"
                   className="bg-background text-foreground"
                 />
               </div>
